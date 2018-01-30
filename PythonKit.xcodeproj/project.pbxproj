@@ -1,0 +1,539 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA3BAE10201E920D0082CE06 /* PythonGlue.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE0F201E920D0082CE06 /* PythonGlue.swift */; };
+		AA3BAE36201E95D10082CE06 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE35201E95D10082CE06 /* main.swift */; };
+		AA63769B201E9E0200D3EE43 /* LoggerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA637697201E9DE100D3EE43 /* LoggerKit.framework */; };
+		AA6376A8201E9EDB00D3EE43 /* CommandLineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA6376A4201E9EBA00D3EE43 /* CommandLineKit.framework */; };
+		AA6376AC201E9F7100D3EE43 /* OperatingSystemVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA3BAE43201E997A0082CE06 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA3BADFB201E92000082CE06 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA3BAE03201E92000082CE06;
+			remoteInfo = PythonKit;
+		};
+		AA637696201E9DE100D3EE43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AABBD9A41E5761BD00AE5B46;
+			remoteInfo = LoggerKit;
+		};
+		AA637698201E9DE100D3EE43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AA912BE01EE96C56002DD639;
+			remoteInfo = LoggerKitWatch;
+		};
+		AA6376A3201E9EBA00D3EE43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5D06884319674D7D00BBFAAC;
+			remoteInfo = CommandLineKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA3BAE31201E95D10082CE06 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		AA3BAE04201E92000082CE06 /* PythonKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PythonKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA3BAE08201E92000082CE06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA3BAE0F201E920D0082CE06 /* PythonGlue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PythonGlue.swift; sourceTree = "<group>"; };
+		AA3BAE33201E95D10082CE06 /* PythonTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PythonTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA3BAE35201E95D10082CE06 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		AA3BAE3C201E960E0082CE06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LoggerKit.xcodeproj; path = ../LoggerKit/LoggerKit.xcodeproj; sourceTree = "<group>"; };
+		AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommandLineKit.xcodeproj; path = ../CommandLineKit/CommandLineKit.xcodeproj; sourceTree = "<group>"; };
+		AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersion.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA3BAE00201E92000082CE06 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA3BAE30201E95D10082CE06 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA6376A8201E9EDB00D3EE43 /* CommandLineKit.framework in Frameworks */,
+				AA63769B201E9E0200D3EE43 /* LoggerKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA3BADFA201E92000082CE06 = {
+			isa = PBXGroup;
+			children = (
+				AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */,
+				AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */,
+				AA3BAE06201E92000082CE06 /* PythonKit */,
+				AA3BAE34201E95D10082CE06 /* PythonTool */,
+				AA3BAE05201E92000082CE06 /* Products */,
+				AA63769A201E9E0200D3EE43 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		AA3BAE05201E92000082CE06 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA3BAE04201E92000082CE06 /* PythonKit.framework */,
+				AA3BAE33201E95D10082CE06 /* PythonTool */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA3BAE06201E92000082CE06 /* PythonKit */ = {
+			isa = PBXGroup;
+			children = (
+				AA3BAE0F201E920D0082CE06 /* PythonGlue.swift */,
+				AA3BAE08201E92000082CE06 /* Info.plist */,
+			);
+			path = PythonKit;
+			sourceTree = "<group>";
+		};
+		AA3BAE34201E95D10082CE06 /* PythonTool */ = {
+			isa = PBXGroup;
+			children = (
+				AA3BAE35201E95D10082CE06 /* main.swift */,
+				AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */,
+				AA3BAE3C201E960E0082CE06 /* Info.plist */,
+			);
+			path = PythonTool;
+			sourceTree = "<group>";
+		};
+		AA637692201E9DE100D3EE43 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA637697201E9DE100D3EE43 /* LoggerKit.framework */,
+				AA637699201E9DE100D3EE43 /* LoggerKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA63769A201E9E0200D3EE43 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AA6376A0201E9EBA00D3EE43 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA6376A4201E9EBA00D3EE43 /* CommandLineKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		AA3BAE01201E92000082CE06 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		AA3BAE03201E92000082CE06 /* PythonKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA3BAE0C201E92000082CE06 /* Build configuration list for PBXNativeTarget "PythonKit" */;
+			buildPhases = (
+				AA3BADFF201E92000082CE06 /* Sources */,
+				AA3BAE00201E92000082CE06 /* Frameworks */,
+				AA3BAE01201E92000082CE06 /* Headers */,
+				AA3BAE02201E92000082CE06 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PythonKit;
+			productName = PythonKit;
+			productReference = AA3BAE04201E92000082CE06 /* PythonKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		AA3BAE32201E95D10082CE06 /* PythonTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA3BAE39201E95D10082CE06 /* Build configuration list for PBXNativeTarget "PythonTool" */;
+			buildPhases = (
+				AA3BAE2F201E95D10082CE06 /* Sources */,
+				AA3BAE30201E95D10082CE06 /* Frameworks */,
+				AA3BAE31201E95D10082CE06 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA3BAE44201E997A0082CE06 /* PBXTargetDependency */,
+			);
+			name = PythonTool;
+			productName = PythonTool;
+			productReference = AA3BAE33201E95D10082CE06 /* PythonTool */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA3BADFB201E92000082CE06 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0920;
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = "Pedro José Pereira Vieito";
+				TargetAttributes = {
+					AA3BAE03201E92000082CE06 = {
+						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
+						ProvisioningStyle = Automatic;
+					};
+					AA3BAE32201E95D10082CE06 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AA3BADFE201E92000082CE06 /* Build configuration list for PBXProject "PythonKit" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = AA3BADFA201E92000082CE06;
+			productRefGroup = AA3BAE05201E92000082CE06 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = AA6376A0201E9EBA00D3EE43 /* Products */;
+					ProjectRef = AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */;
+				},
+				{
+					ProductGroup = AA637692201E9DE100D3EE43 /* Products */;
+					ProjectRef = AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				AA3BAE03201E92000082CE06 /* PythonKit */,
+				AA3BAE32201E95D10082CE06 /* PythonTool */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		AA637697201E9DE100D3EE43 /* LoggerKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = LoggerKit.framework;
+			remoteRef = AA637696201E9DE100D3EE43 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		AA637699201E9DE100D3EE43 /* LoggerKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = LoggerKit.framework;
+			remoteRef = AA637698201E9DE100D3EE43 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		AA6376A4201E9EBA00D3EE43 /* CommandLineKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = CommandLineKit.framework;
+			remoteRef = AA6376A3201E9EBA00D3EE43 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA3BAE02201E92000082CE06 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA3BADFF201E92000082CE06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA3BAE10201E920D0082CE06 /* PythonGlue.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA3BAE2F201E95D10082CE06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA6376AC201E9F7100D3EE43 /* OperatingSystemVersion.swift in Sources */,
+				AA3BAE36201E95D10082CE06 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA3BAE44201E997A0082CE06 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA3BAE03201E92000082CE06 /* PythonKit */;
+			targetProxy = AA3BAE43201E997A0082CE06 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA3BAE0A201E92000082CE06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		AA3BAE0B201E92000082CE06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		AA3BAE0D201E92000082CE06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = PythonKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		AA3BAE0E201E92000082CE06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = PythonKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+		AA3BAE37201E95D10082CE06 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				INFOPLIST_FILE = PythonTool/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx";
+				LIBRARY_SEARCH_PATHS = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		AA3BAE38201E95D10082CE06 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				INFOPLIST_FILE = PythonTool/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx";
+				LIBRARY_SEARCH_PATHS = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA3BADFE201E92000082CE06 /* Build configuration list for PBXProject "PythonKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA3BAE0A201E92000082CE06 /* Debug */,
+				AA3BAE0B201E92000082CE06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA3BAE0C201E92000082CE06 /* Build configuration list for PBXNativeTarget "PythonKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA3BAE0D201E92000082CE06 /* Debug */,
+				AA3BAE0E201E92000082CE06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA3BAE39201E95D10082CE06 /* Build configuration list for PBXNativeTarget "PythonTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA3BAE37201E95D10082CE06 /* Debug */,
+				AA3BAE38201E95D10082CE06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA3BADFB201E92000082CE06 /* Project object */;
+}
