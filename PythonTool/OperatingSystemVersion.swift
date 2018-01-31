@@ -10,6 +10,10 @@ import Foundation
 
 extension OperatingSystemVersion: CustomStringConvertible {
     
+    public var shortVersion: String {
+        return "\(self.majorVersion).\(self.minorVersion)"
+    }
+    
     public var description: String {
         return "\(self.majorVersion).\(self.minorVersion).\(self.patchVersion)"
     }

@@ -20,7 +20,7 @@ let cli = CommandLineKit.CommandLine()
 cli.addOptions(listOption, verboseOption, helpOption)
 
 do {
-    try cli.parse()
+    try cli.parse(strict: true)
 }
 catch {
     cli.printUsage(error)
@@ -49,14 +49,14 @@ OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))
                        minorVersion: Int(pythonVersionInfo.get(member: "minor"))!,
                        patchVersion: Int(pythonVersionInfo.get(member: "micro"))!)
 
-Logger.log(important: "PythonKit")
+Logger.log(important: "Python \(pythonVersion.shortVersion)")
 Logger.log(info: "Version: \(pythonVersion)")
 Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
 
 let installedModules = pipModule.call(member: "get_installed_distributions")
 
-if listOption.value, installedModules.count > 0 {
-    Logger.log(important: "Installed Modules (\(installedModules.count)):")
+if listOption.value, !installedModules.isEmpty {
+    Logger.log(important: "Installed Modules (\(installedModules.count))")
     
     for installedModule in installedModules {
         Logger.log(success: installedModule)
