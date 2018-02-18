@@ -6,6 +6,8 @@
 build/
 .build/
 DerivedData/
+Package.pins
+Package.resolved
 
 ## Various settings
 .DS_Store

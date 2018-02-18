@@ -1,0 +1,5 @@
+module Python [system] {
+  header "Python.h"
+  link "python2.7"
+  export *
+}

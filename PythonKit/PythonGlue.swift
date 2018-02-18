@@ -1,3 +1,11 @@
+//
+//  PythonGlue.swift
+//  PythonKit
+//
+//  Created by Chris Lattner
+//  https://lists.swift.org/pipermail/swift-evolution/Week-of-Mon-20171204/042029.html
+//
+
 //===----------------------------------------------------------------------===//
 //
 // This file defines an interopability layer for talking to Python from Swift.
@@ -768,7 +776,7 @@ extension Int : PythonConvertible {
         
         assert(PyErr_Occurred() == nil,
                "Python error occurred somewhere but wasn't handled")
-
+        
         let value = PyInt_AsLong(pyObj)
         
         // PyInt_AsLong return -1 and sets an error if the Python value isn't

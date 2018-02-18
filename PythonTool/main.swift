@@ -6,7 +6,6 @@
 //  Copyright © 2018 Pedro José Pereira Vieito. All rights reserved.
 //
 
-
 import Foundation
 import LoggerKit
 import CommandLineKit
@@ -41,8 +40,6 @@ let sysPath = sysModule.get(member: "path")
 
 sysPath.call(member: "insert", args: 0, "/usr/local/lib/python2.7/site-packages")
 
-let pipModule = Python.import("pip")
-
 let pythonVersionInfo = sysModule.get(member: "version_info")
 let pythonVersion =
 OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))!,
@@ -53,12 +50,17 @@ Logger.log(important: "Python \(pythonVersion.shortVersion)")
 Logger.log(info: "Version: \(pythonVersion)")
 Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
 
-let installedModules = pipModule.call(member: "get_installed_distributions")
+if listOption.value {
 
-if listOption.value, !installedModules.isEmpty {
-    Logger.log(important: "Installed Modules (\(installedModules.count))")
+    let pipModule = Python.import("pip")
     
-    for installedModule in installedModules {
-        Logger.log(success: installedModule)
+    let installedModules = pipModule.call(member: "get_installed_distributions")
+    
+    if !installedModules.isEmpty {
+        Logger.log(important: "Installed Modules (\(installedModules.count))")
+        
+        for installedModule in installedModules {
+            Logger.log(success: installedModule)
+        }
     }
 }

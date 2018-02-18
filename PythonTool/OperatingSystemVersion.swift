@@ -1,5 +1,5 @@
 //
-//  Ope.swift
+//  OperatingSystemVersion.swift
 //  PythonTool
 //
 //  Created by Pedro José Pereira Vieito on 29/1/18.
