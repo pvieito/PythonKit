@@ -12,11 +12,12 @@ import CommandLineKit
 import PythonKit
 
 let listOption = BoolOption(shortFlag: "l", longFlag: "list", helpMessage: "List installed modules.")
+let pathOption = BoolOption(shortFlag: "p", longFlag: "path", helpMessage: "List Python paths.")
 let verboseOption = BoolOption(shortFlag: "v", longFlag: "verbose", helpMessage: "Verbose mode.")
 let helpOption = BoolOption(shortFlag: "h", longFlag: "help", helpMessage: "Prints a help message.")
 
 let cli = CommandLineKit.CommandLine()
-cli.addOptions(listOption, verboseOption, helpOption)
+cli.addOptions(listOption, pathOption, verboseOption, helpOption)
 
 do {
     try cli.parse(strict: true)
@@ -36,9 +37,9 @@ Logger.logLevel = verboseOption.value ? .debug : .info
 
 let sysModule = Python.import("sys")!
 
-let sysPath = sysModule.get(member: "path")
+let sysPaths = sysModule.get(member: "path")
 
-sysPath.call(member: "insert", args: 0, "/usr/local/lib/python2.7/site-packages")
+sysPaths.call(member: "insert", args: 0, "/usr/local/lib/python2.7/site-packages")
 
 let pythonVersionInfo = sysModule.get(member: "version_info")
 let pythonVersion =
@@ -49,6 +50,17 @@ OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))
 Logger.log(important: "Python \(pythonVersion.shortVersion)")
 Logger.log(info: "Version: \(pythonVersion)")
 Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
+
+if pathOption.value {
+    
+    if !sysPaths.isEmpty {
+        Logger.log(important: "Python Paths (\(sysPaths.count))")
+        
+        for sysPath in sysPaths {
+            Logger.log(success: sysPath)
+        }
+    }
+}
 
 if listOption.value {
 
