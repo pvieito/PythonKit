@@ -72,7 +72,7 @@ if listOption.value {
     let installedModules = pipModule.call(member: "get_installed_distributions")
     
     if !installedModules.isEmpty {
-        Logger.log(important: "Installed Modules (\(installedModules.count))")
+        Logger.log(important: "Python Modules (\(installedModules.count))")
         
         for installedModule in installedModules {
             Logger.log(success: installedModule)
