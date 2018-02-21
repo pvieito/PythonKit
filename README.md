@@ -20,7 +20,7 @@ Can be implemented in Swift through PythonKit with the following code:
 import PythonKit
 
 // import sys
-let sysModule = Python.import("sys")
+let sysModule = Python.import("sys")!
 
 // print("Python Path: {}".format(sys.path[0]))
 print("Python Path: \(sysModule.get(member: "path")[0])")
