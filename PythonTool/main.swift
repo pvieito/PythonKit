@@ -34,7 +34,7 @@ if helpOption.value {
 Logger.logMode = .commandLine
 Logger.logLevel = verboseOption.value ? .debug : .info
 
-let sysModule = Python.import("sys")
+let sysModule = Python.import("sys")!
 
 let sysPath = sysModule.get(member: "path")
 
@@ -52,7 +52,10 @@ Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
 
 if listOption.value {
 
-    let pipModule = Python.import("pip")
+    guard let pipModule = Python.import("pip") else {
+        Logger.log(error: "Module “pip” not available.")
+        exit(-1)
+    }
     
     let installedModules = pipModule.call(member: "get_installed_distributions")
     

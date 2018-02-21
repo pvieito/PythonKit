@@ -565,8 +565,13 @@ public struct PythonInterface {
         builtins = PyVal(borrowed: PyEval_GetBuiltins())
     }
     
-    public func `import`(_ name: String) -> PyVal {
-        return PyVal(owned: PyImport_ImportModule(name)!)
+    public func `import`(_ name: String) -> PyVal? {
+        
+        guard let module = PyImport_ImportModule(name) else {
+            return nil
+        }
+
+        return PyVal(owned: module)
     }
     
     // TODO: Make the PythonInterface type itself `DynamicCallable`, so that
