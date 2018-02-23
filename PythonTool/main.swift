@@ -35,47 +35,53 @@ if helpOption.value {
 Logger.logMode = .commandLine
 Logger.logLevel = verboseOption.value ? .debug : .info
 
-let sysModule = Python.import("sys")!
-
-let sysPaths = sysModule.get(member: "path")
-
-sysPaths.call(member: "insert", args: 0, "/usr/local/lib/python2.7/site-packages")
-
-let pythonVersionInfo = sysModule.get(member: "version_info")
-let pythonVersion =
-OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))!,
-                       minorVersion: Int(pythonVersionInfo.get(member: "minor"))!,
-                       patchVersion: Int(pythonVersionInfo.get(member: "micro"))!)
-
-Logger.log(important: "Python \(pythonVersion.shortVersion)")
-Logger.log(info: "Version: \(pythonVersion)")
-Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
-
-if pathOption.value {
+do {
+    let sysModule = try Python.import("sys")
     
-    if !sysPaths.isEmpty {
-        Logger.log(important: "Python Paths (\(sysPaths.count))")
+    let sysPaths = sysModule.get(member: "path")
+    
+    sysPaths.call(member: "insert", 0, "/usr/local/lib/python2.7/site-packages")
+    
+    let pythonVersionInfo = sysModule.get(member: "version_info")
+    let pythonVersion =
+        OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))!,
+                               minorVersion: Int(pythonVersionInfo.get(member: "minor"))!,
+                               patchVersion: Int(pythonVersionInfo.get(member: "micro"))!)
+    
+    Logger.log(important: "Python \(pythonVersion.shortVersion)")
+    Logger.log(info: "Version: \(pythonVersion)")
+    Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
+    
+    if pathOption.value {
         
-        for sysPath in sysPaths {
-            Logger.log(success: sysPath)
+        if !sysPaths.isEmpty {
+            Logger.log(important: "Python Paths (\(sysPaths.count))")
+            
+            for sysPath in sysPaths {
+                Logger.log(success: sysPath)
+            }
         }
     }
+    
+    if listOption.value {
+        
+        guard let pipModule = try? Python.import("pip") else {
+            Logger.log(error: "Module “pip” not available.")
+            exit(-1)
+        }
+        
+        let installedModules = pipModule.call(member: "get_installed_distributions")
+        
+        if !installedModules.isEmpty {
+            Logger.log(important: "Python Modules (\(installedModules.count))")
+            
+            for installedModule in installedModules {
+                Logger.log(success: installedModule)
+            }
+        }
+    }
+    
 }
-
-if listOption.value {
-
-    guard let pipModule = Python.import("pip") else {
-        Logger.log(error: "Module “pip” not available.")
-        exit(-1)
-    }
-    
-    let installedModules = pipModule.call(member: "get_installed_distributions")
-    
-    if !installedModules.isEmpty {
-        Logger.log(important: "Python Modules (\(installedModules.count))")
-        
-        for installedModule in installedModules {
-            Logger.log(success: installedModule)
-        }
-    }
+catch {
+    Logger.log(error: error)
 }
