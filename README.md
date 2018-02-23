@@ -33,9 +33,8 @@ print("Python Path: \(sysModule.get(member: "path")[0])")
 print("Python Version: \(sysModule.get(member: "version"))")
 ```
 
-## Note
+## Notes
 
-`PythonGlue.swift` is code from Chris Lattner [Python Interoperation](https://forums.swift.org/t/swift-python-interop-library-xcode-9-3b3-edition/10242) playground.
-
-Hopefully PythonKit could be superseeded by [Dynamic Member Lookup](https://github.com/apple/swift-evolution/blob/master/proposals/0195-dynamic-member-lookup.md), Dynamic Callable and a common Python wrapper in Swift 5.
+- `PythonGlue.swift` is code from Chris Lattner [Python Interoperation](https://forums.swift.org/t/swift-python-interop-library-xcode-9-3b3-edition/10242) playground.
+- Hopefully PythonKit could be superseeded by [Dynamic Member Lookup](https://github.com/apple/swift-evolution/blob/master/proposals/0195-dynamic-member-lookup.md), Dynamic Callable and a common Python wrapper in Swift 5.
 
