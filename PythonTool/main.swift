@@ -36,13 +36,13 @@ Logger.logMode = .commandLine
 Logger.logLevel = verboseOption.value ? .debug : .info
 
 do {
-    let sysModule = try Python.import("sys")
+    let sys = try Python.import("sys")
     
-    let sysPaths = sysModule.get(member: "path")
+    let sysPaths = sys.get(member: "path")
     
     sysPaths.call(member: "insert", 0, "/usr/local/lib/python2.7/site-packages")
     
-    let pythonVersionInfo = sysModule.get(member: "version_info")
+    let pythonVersionInfo = sys.get(member: "version_info")
     let pythonVersion =
         OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))!,
                                minorVersion: Int(pythonVersionInfo.get(member: "minor"))!,
@@ -50,16 +50,19 @@ do {
     
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
     Logger.log(info: "Version: \(pythonVersion)")
-    Logger.log(verbose: "Version String:\n\(sysModule.get(member: "version"))")
+    Logger.log(verbose: "Version String:\n\(sys.get(member: "version"))")
     
     if pathOption.value {
         
+        Logger.log(important: "Python Paths (\(sysPaths.count))")
+
         if !sysPaths.isEmpty {
-            Logger.log(important: "Python Paths (\(sysPaths.count))")
-            
             for sysPath in sysPaths {
                 Logger.log(success: sysPath)
             }
+        }
+        else {
+            Logger.log(warning: "No paths avaliable.")
         }
     }
     
@@ -72,12 +75,15 @@ do {
         
         let installedModules = pipModule.call(member: "get_installed_distributions")
         
+        Logger.log(important: "Python Modules (\(installedModules.count))")
+        
         if !installedModules.isEmpty {
-            Logger.log(important: "Python Modules (\(installedModules.count))")
-            
             for installedModule in installedModules {
                 Logger.log(success: installedModule)
             }
+        }
+        else {
+            Logger.log(warning: "No modules avaliable.")
         }
     }
     

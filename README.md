@@ -14,7 +14,6 @@ Some Python code like this:
 import sys
 
 print("Python Path: {}".format(sys.path[0]))
-
 print("Python Version: {}".format(sys.version))
 ```
 
@@ -23,14 +22,10 @@ Can be implemented in Swift through PythonKit with the following code:
 ```swift
 import PythonKit
 
-// import sys
-let sysModule = try! Python.import("sys")
+let sys = try! Python.import("sys")
 
-// print("Python Path: {}".format(sys.path[0]))
-print("Python Path: \(sysModule.get(member: "path")[0])")
-
-// print("Python Version: {}".format(sys.version))
-print("Python Version: \(sysModule.get(member: "version"))")
+print("Python Path: \(sys.get(member: "path")[0])")
+print("Python Version: \(sys.get(member: "version"))")
 ```
 
 ## Notes
