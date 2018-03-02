@@ -9,8 +9,8 @@ let package = Package(
         .library(name: "PythonKit", targets: ["PythonKit"])
     ],
     dependencies: [
-        .package(url: "../LoggerKit", .branch("master")),
-        .package(url: "../CommandLineKit", .branch("master"))
+        .package(url: "https://github.com/pvieito/CommandLineKit.git", .branch("master")),
+        .package(url: "https://github.com/pvieito/LoggerKit", .branch("master"))
     ],
     targets: [
         .target(name: "PythonTool",
