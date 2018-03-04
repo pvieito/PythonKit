@@ -10,7 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pvieito/CommandLineKit.git", .branch("master")),
-        .package(url: "https://github.com/pvieito/LoggerKit", .branch("master"))
+        .package(url: "https://github.com/pvieito/LoggerKit.git", .branch("master"))
     ],
     targets: [
         .target(name: "PythonTool",
