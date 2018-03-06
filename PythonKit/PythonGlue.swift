@@ -29,6 +29,7 @@
 //===----------------------------------------------------------------------===//
 
 import Python
+import Foundation
 
 //===----------------------------------------------------------------------===//
 // MARK: PyRef Implementation
@@ -178,7 +179,7 @@ extension PyVal {
 
 /// This represents the result of a failable operation when working with
 /// python values.
-public enum PythonError : Error {
+public enum PythonError : LocalizedError {
     /// This represents an exception thrown out of a Python API.  This can occur
     /// on calls.
     case exception(_: PyVal)
@@ -193,15 +194,19 @@ public enum PythonError : Error {
     
     /// An access to an invalid tuple member was performed.
     case invalidTupleMember(base: PyVal)
+    
+    public var errorDescription: String? {
+        return self.description
+    }
 }
 
 extension PythonError : CustomStringConvertible {
     public var description: String {
         switch self {
-        case .exception(let p): return "exception: \(p)"
-        case .invalidCall(let p): return "invalidCall: \(p)"
-        case .invalidMember(let m): return "invalidMember: \(m)"
-        case .invalidTupleMember(let p): return "invalidTupleMember: \(p)"
+        case .exception(let p): return "Python Exception: \(p)"
+        case .invalidCall(let p): return "Python Invalid Call: \(p)"
+        case .invalidMember(let m): return "Python Invalid Member: \(m)"
+        case .invalidTupleMember(let p): return "Python Invalid Tuple Member: \(p)"
         }
     }
 }
