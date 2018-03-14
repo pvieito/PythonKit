@@ -4,7 +4,7 @@ Swift framework to interact with Python.
 
 ## Requirements
 
-`PythonKit` requires Swift 4.1 and/or Xcode 9.3 and has been tested both on macOS and Linux.  
+`PythonKit` requires Swift 4.2 and has been tested both on macOS and Linux.  
 
 ## Usage
 
@@ -13,6 +13,7 @@ Some Python code like this:
 ```python
 import sys
 
+print("Python {}.{}".format(sys.version_info.major, sys.version_info.minor))
 print("Python Path: {}".format(sys.path[0]))
 print("Python Version: {}".format(sys.version))
 ```
@@ -22,10 +23,11 @@ Can be implemented in Swift through PythonKit with the following code:
 ```swift
 import PythonKit
 
-let sys = try! Python.import("sys")
+let sys = try Python.import("sys")
 
-print("Python Path: \(sys.get(member: "path")[0])")
-print("Python Version: \(sys.get(member: "version"))")
+print("Python \(sys.versionInfo.major).\(sys.versionInfo.minor)")
+print("Python Path: \(sys.path[0])")
+print("Python Version: \(sys.version)")
 ```
 
 ## Notes

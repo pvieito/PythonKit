@@ -38,27 +38,24 @@ Logger.logLevel = verboseOption.value ? .debug : .info
 do {
     let sys = try Python.import("sys")
     
-    let sysPaths = sys.get(member: "path")
+    sys.path.call(member: "insert", 0, "/usr/local/lib/python2.7/site-packages")
     
-    sysPaths.call(member: "insert", 0, "/usr/local/lib/python2.7/site-packages")
-    
-    let pythonVersionInfo = sys.get(member: "version_info")
     let pythonVersion =
-        OperatingSystemVersion(majorVersion: Int(pythonVersionInfo.get(member: "major"))!,
-                               minorVersion: Int(pythonVersionInfo.get(member: "minor"))!,
-                               patchVersion: Int(pythonVersionInfo.get(member: "micro"))!)
+        OperatingSystemVersion(majorVersion: Int(sys.versionInfo.major) ?? 0,
+                               minorVersion: Int(sys.versionInfo.minor) ?? 0,
+                               patchVersion: Int(sys.versionInfo.micro) ?? 0)
     
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
     Logger.log(info: "Version: \(pythonVersion)")
-    Logger.log(verbose: "Version String:\n\(sys.get(member: "version"))")
+    Logger.log(verbose: "Version String:\n\(sys.version)")
     
     if pathOption.value {
         
-        Logger.log(important: "Python Paths (\(sysPaths.count))")
-
-        if !sysPaths.isEmpty {
-            for sysPath in sysPaths {
-                Logger.log(success: sysPath)
+        Logger.log(important: "Python Paths (\(sys.path.count))")
+        
+        if !sys.path.isEmpty {
+            for searchPath in sys.path {
+                Logger.log(success: searchPath)
             }
         }
         else {
@@ -68,12 +65,9 @@ do {
     
     if listOption.value {
         
-        guard let pipModule = try? Python.import("pip") else {
-            Logger.log(error: "Module “pip” not available.")
-            exit(-1)
-        }
+        let pip = try Python.import("pip")
         
-        let installedModules = pipModule.call(member: "get_installed_distributions")
+        let installedModules = pip.call(member: "get_installed_distributions")
         
         Logger.log(important: "Python Modules (\(installedModules.count))")
         
@@ -86,7 +80,6 @@ do {
             Logger.log(warning: "No modules avaliable.")
         }
     }
-    
 }
 catch {
     Logger.log(error: error)
