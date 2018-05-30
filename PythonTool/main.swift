@@ -36,16 +36,18 @@ Logger.logMode = .commandLine
 Logger.logLevel = verboseOption.value ? .debug : .info
 
 do {
-    let sys = try Python.import("sys")
+    let sys = try Python.attemptImport("sys")
     
-    sys.path.call(member: "insert", 0, "/usr/local/lib/python2.7/site-packages")
+    try sys.path.insert.throwing.call(0, "/usr/local/lib/python2.7/site-packages")
     
     let pythonVersion =
-        OperatingSystemVersion(majorVersion: Int(sys.versionInfo.major) ?? 0,
-                               minorVersion: Int(sys.versionInfo.minor) ?? 0,
-                               patchVersion: Int(sys.versionInfo.micro) ?? 0)
+        OperatingSystemVersion(majorVersion: Int(sys.version_info.major) ?? 0,
+                               minorVersion: Int(sys.version_info.minor) ?? 0,
+                               patchVersion: Int(sys.version_info.micro) ?? 0)
     
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
+    Logger.log(info: "Executable: \(sys.executable)")
+    Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
     Logger.log(info: "Version: \(pythonVersion)")
     Logger.log(verbose: "Version String:\n\(sys.version)")
     
@@ -65,15 +67,17 @@ do {
     
     if listOption.value {
         
-        let pip = try Python.import("pip")
+        let pkg_resources = try Python.attemptImport("pkg_resources")
         
-        let installedModules = pip.call(member: "get_installed_distributions")
-        
+        let installedModules = Dictionary<String, PythonObject>(pkg_resources.working_set.by_key)!
+
         Logger.log(important: "Python Modules (\(installedModules.count))")
         
         if !installedModules.isEmpty {
-            for installedModule in installedModules {
-                Logger.log(success: installedModule)
+            let installedModulesArray = installedModules.sorted { $0.key.lowercased() < $1.key.lowercased() }
+            
+            for (_, moduleReference) in installedModulesArray {
+                Logger.log(success: "\(moduleReference.key) (\(moduleReference.version))")
             }
         }
         else {

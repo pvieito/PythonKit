@@ -43,6 +43,20 @@
 			remoteGlobalIDString = 5D06884319674D7D00BBFAAC;
 			remoteInfo = CommandLineKit;
 		};
+		AAF3192220BF3261008F1CAA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 5D06884219674D7D00BBFAAC;
+			remoteInfo = CommandLineKit;
+		};
+		AAF3192420BF3261008F1CAA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = AABBD99C1E5761BD00AE5B46;
+			remoteInfo = LoggerKit;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -82,8 +96,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA6376A8201E9EDB00D3EE43 /* CommandLineKit.framework in Frameworks */,
 				AA63769B201E9E0200D3EE43 /* LoggerKit.framework in Frameworks */,
+				AA6376A8201E9EDB00D3EE43 /* CommandLineKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +211,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				AAF3192320BF3261008F1CAA /* PBXTargetDependency */,
+				AAF3192520BF3261008F1CAA /* PBXTargetDependency */,
 				AA3BAE44201E997A0082CE06 /* PBXTargetDependency */,
 			);
 			name = PythonTool;
@@ -211,7 +227,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Pedro José Pereira Vieito";
 				TargetAttributes = {
 					AA3BAE03201E92000082CE06 = {
@@ -313,6 +329,16 @@
 			target = AA3BAE03201E92000082CE06 /* PythonKit */;
 			targetProxy = AA3BAE43201E997A0082CE06 /* PBXContainerItemProxy */;
 		};
+		AAF3192320BF3261008F1CAA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CommandLineKit;
+			targetProxy = AAF3192220BF3261008F1CAA /* PBXContainerItemProxy */;
+		};
+		AAF3192520BF3261008F1CAA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LoggerKit;
+			targetProxy = AAF3192420BF3261008F1CAA /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -330,6 +356,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -337,6 +364,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -390,6 +418,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -397,6 +426,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
