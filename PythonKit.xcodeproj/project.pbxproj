@@ -82,6 +82,7 @@
 		AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LoggerKit.xcodeproj; path = ../LoggerKit/LoggerKit.xcodeproj; sourceTree = "<group>"; };
 		AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommandLineKit.xcodeproj; path = ../CommandLineKit/CommandLineKit.xcodeproj; sourceTree = "<group>"; };
 		AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersion.swift; sourceTree = "<group>"; };
+		AAC566D020E0511C00F4C84C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +111,7 @@
 				AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */,
 				AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */,
 				AA37F4FF203A392F0084591C /* README.md */,
+				AAC566D020E0511C00F4C84C /* Package.swift */,
 				AA3BAE06201E92000082CE06 /* PythonKit */,
 				AA3BAE34201E95D10082CE06 /* PythonTool */,
 				AA3BAE05201E92000082CE06 /* Products */,
