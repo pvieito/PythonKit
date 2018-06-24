@@ -37,7 +37,7 @@ public typealias OwnedPyObjectPointer = UnsafeMutablePointer<PyObject>
 // - Note: When Swift has ownership, `PyReference` should be removed.
 //   `PythonObject` will define copy constructors, move constructors, etc. to
 //   implement move semantics.
-@_versioned @_fixed_layout
+@usableFromInline @_fixed_layout
 final class PyReference {
     private var pointer: OwnedPyObjectPointer
     
@@ -87,7 +87,7 @@ public struct PythonObject {
     /// The underlying `PyReference`.
     fileprivate var reference: PyReference
     
-    @_versioned
+    @usableFromInline
     init(_ pointer: PyReference) {
         reference = pointer
     }
@@ -125,9 +125,9 @@ extension PythonObject : CustomStringConvertible {
 }
 
 // Make `PythonObject` show up nicely in the Xcode Playground results sidebar.
-extension PythonObject : CustomPlaygroundQuickLookable {
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return .text(description)
+extension PythonObject : CustomPlaygroundDisplayConvertible {
+    public var playgroundDescription: Any {
+        return description
     }
 }
 
