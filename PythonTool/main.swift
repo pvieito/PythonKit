@@ -70,7 +70,7 @@ do {
         let pkg_resources = try Python.attemptImport("pkg_resources")
         
         let installedModules = Dictionary<String, PythonObject>(pkg_resources.working_set.by_key)!
-
+        
         Logger.log(important: "Python Modules (\(installedModules.count))")
         
         if !installedModules.isEmpty {

@@ -13,10 +13,8 @@ let package = Package(
         .package(url: "https://github.com/pvieito/LoggerKit.git", .branch("master"))
     ],
     targets: [
-        .target(name: "PythonTool",
-                dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"],
-                path: "PythonTool"),
+        .target(name: "PythonTool", dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"], path: "PythonTool"),
         .target(name: "PythonKit", dependencies: ["Python"], path: "PythonKit"),
-        .target(name: "Python", path: "Python")
+        .systemLibrary(name: "Python", pkgConfig: "python")
     ]
 )
