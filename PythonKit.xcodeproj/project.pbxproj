@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA352EB521222B03004DBE5C /* PythonGlue+Python3.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA352EB421222B03004DBE5C /* PythonGlue+Python3.swift */; };
 		AA3BAE10201E920D0082CE06 /* PythonGlue.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE0F201E920D0082CE06 /* PythonGlue.swift */; };
 		AA3BAE36201E95D10082CE06 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE35201E95D10082CE06 /* main.swift */; };
 		AA63769B201E9E0200D3EE43 /* LoggerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA637697201E9DE100D3EE43 /* LoggerKit.framework */; };
@@ -72,6 +73,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA352EB421222B03004DBE5C /* PythonGlue+Python3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PythonGlue+Python3.swift"; sourceTree = "<group>"; };
 		AA37F4FF203A392F0084591C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		AA3BAE04201E92000082CE06 /* PythonKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PythonKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA3BAE08201E92000082CE06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				AA3BAE0F201E920D0082CE06 /* PythonGlue.swift */,
+				AA352EB421222B03004DBE5C /* PythonGlue+Python3.swift */,
 				AA3BAE08201E92000082CE06 /* Info.plist */,
 			);
 			path = PythonKit;
@@ -313,6 +316,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA352EB521222B03004DBE5C /* PythonGlue+Python3.swift in Sources */,
 				AA3BAE10201E920D0082CE06 /* PythonGlue.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -486,7 +490,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PYTHON3;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = _PYHTON2;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 			};
@@ -515,7 +519,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PYTHON3;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = _PYHTON2;
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;

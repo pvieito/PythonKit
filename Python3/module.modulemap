@@ -1,0 +1,5 @@
+module Python3 {
+    umbrella header "Python.h"
+    export *
+    link "python3.5m"
+}
