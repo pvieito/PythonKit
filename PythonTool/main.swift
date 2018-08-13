@@ -37,9 +37,7 @@ Logger.logLevel = verboseOption.value ? .debug : .info
 
 do {
     let sys = try Python.attemptImport("sys")
-    
-    try sys.path.insert.throwing.call(0, "/usr/local/lib/python2.7/site-packages")
-    
+        
     let pythonVersion =
         OperatingSystemVersion(majorVersion: Int(sys.version_info.major) ?? 0,
                                minorVersion: Int(sys.version_info.minor) ?? 0,

@@ -14,7 +14,8 @@ let package = Package(
     ],
     targets: [
         .target(name: "PythonTool", dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"], path: "PythonTool"),
-        .target(name: "PythonKit", dependencies: ["Python"], path: "PythonKit"),
-        .systemLibrary(name: "Python", path: "Python", pkgConfig: "python2"),
+        .target(name: "PythonKit", dependencies: ["Python3"], path: "PythonKit"),
+        //.systemLibrary(name: "Python", path: "Python", pkgConfig: "python2"),
+        .systemLibrary(name: "Python3", path: "Python3", pkgConfig: "python3"),
     ]
 )
