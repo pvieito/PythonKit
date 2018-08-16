@@ -1,5 +1,4 @@
 module Python {
     umbrella header "Python.h"
     export *
-    link "python2.7"
 }
