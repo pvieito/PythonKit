@@ -8,9 +8,7 @@ Swift framework to interact with Python.
 
 ## Build
 
-You can build `PythonKit` with Swift PM. You can configure the Python version to use in the build process with the `PYTHON` environment variable (for example, `PYTHON=2`). The default build will use Python 3.
-
-Then you can build 
+`PythonKit` can be built with Swift PM. To configure the Python version to use in the build process you can set the `PYTHON` environment variable (for example, `PYTHON=2`). The default build will use Python 3.
 
 ```bash
 $ cd PythonKit
@@ -23,7 +21,7 @@ $ PYTHON=2 swift run
 [ ] Version: 2.7.10
 ```
 
-If the compiler throws any error make sure `pkg-config` is installed as Swift PM uses it to find the Python library and headers. Also, you must set the `PKG_CONFIG_PATH` environment variable with the appropiate paths if `pkg-config` does not find the `python2` and `python3` `.pc` files:
+If the compiler throws an error make sure `pkg-config` is installed as Swift PM uses it to find the Python library and headers. Also, you must set the `PKG_CONFIG_PATH` environment variable with the appropiate paths if `pkg-config` does not find the `python2` and `python3` `.pc` files:
 
 ```bash
 $ pkg-config --libs python2
