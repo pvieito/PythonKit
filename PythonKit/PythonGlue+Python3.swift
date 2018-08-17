@@ -26,8 +26,8 @@ internal func PyString_FromStringAndSize(_ string: UnsafePointer<Int8>!, _ size:
 }
 
 internal func PySys_SetPath(_ path: UnsafePointer<CChar>!) {
-    PySys_SetPathUnsafePointer(
-        Py_DecodeLocale(path.baseAddress, UnsafeMutablePointer(bitPattern: 0))
+    PySys_SetPath(
+        UnsafePointer(Py_DecodeLocale(path, UnsafeMutablePointer(bitPattern: 0)))
     )
 }
 #endif
