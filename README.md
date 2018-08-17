@@ -14,8 +14,8 @@ Then you can build
 
 ```bash
 $ cd PythonKit
-$ swift run
-[*] PYTHON=2 Python 2.7
+$ PYTHON=2 swift run
+[*] Python 2.7
 [ ] Executable: /usr/bin/python
 [ ] Version: 2.7.12
 $ swift package clean
