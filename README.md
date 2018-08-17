@@ -14,15 +14,15 @@ Then you can build
 
 ```bash
 $ cd PythonKit
+$ swift run
+[*] Python 3.7
+[ ] Version: 3.7.0
+[ ] Executable Prefix: /Library/Frameworks/Python.framework/Versions/3.7
+$ swift package clean
 $ PYTHON=2 swift run
 [*] Python 2.7
-[ ] Executable: /usr/bin/python
-[ ] Version: 2.7.12
-$ swift package clean
-$ swift run
-[*] Python 3.6
-[ ] Executable: /usr/bin/python3
-[ ] Version: 3.6.3
+[ ] Version: 2.7.10
+[ ] Executable Prefix: /System/Library/Frameworks/Python.framework/Versions/2.7
 ```
 
 If  the compiler throws any error make sure `pkg-config` is installed as Swift PM uses it to find the Python library and headers. Also, you must set the `PKG_CONFIG_PATH` environment variable with the appropiate paths if `pkg-config` does not find the `python2` and `python3` `.pc` files:
