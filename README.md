@@ -25,7 +25,7 @@ If the compiler throws an error make sure `pkg-config` is installed as Swift PM 
 
 ```bash
 $ pkg-config --libs python2
-Package python was not found in the pkg-config search path.
+Package python2 was not found in the pkg-config search path.
 Perhaps you should add the directory containing `python2.pc'
 to the PKG_CONFIG_PATH environment variable
 No package 'python2' found
