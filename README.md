@@ -4,7 +4,7 @@ Swift framework to interact with Python.
 
 ## Requirements
 
-`PythonKit` requires recent [Swift 4.2 toolchains](https://swift.org/download/#swift-42-development) and has been tested both on macOS and Linux.
+`PythonKit` requires a recent [Swift 4.2 toolchain](https://swift.org/download/#swift-42-convergence-snapshots) and has been tested both on macOS and Linux.
 
 ## Build
 
@@ -17,15 +17,13 @@ $ cd PythonKit
 $ swift run
 [*] Python 3.7
 [ ] Version: 3.7.0
-[ ] Executable Prefix: /Library/Frameworks/Python.framework/Versions/3.7
 $ swift package clean
 $ PYTHON=2 swift run
 [*] Python 2.7
 [ ] Version: 2.7.10
-[ ] Executable Prefix: /System/Library/Frameworks/Python.framework/Versions/2.7
 ```
 
-If  the compiler throws any error make sure `pkg-config` is installed as Swift PM uses it to find the Python library and headers. Also, you must set the `PKG_CONFIG_PATH` environment variable with the appropiate paths if `pkg-config` does not find the `python2` and `python3` `.pc` files:
+If the compiler throws any error make sure `pkg-config` is installed as Swift PM uses it to find the Python library and headers. Also, you must set the `PKG_CONFIG_PATH` environment variable with the appropiate paths if `pkg-config` does not find the `python2` and `python3` `.pc` files:
 
 ```bash
 $ pkg-config --libs python2
@@ -62,7 +60,6 @@ Some Python code like this:
 import sys
 
 print(f"Python {sys.version_info.major}.{sys.version_info.minor}")
-print(f"Python Executable: {sys.executable}")
 print(f"Python Version: {sys.version}")
 ```
 
@@ -74,7 +71,6 @@ import PythonKit
 let sys = try Python.import("sys")
 
 print("Python \(sys.version_info.major).\(sys.version_info.minor)")
-print("Python Executable: \(sys.executable)")
 print("Python Version: \(sys.version)")
 ```
 

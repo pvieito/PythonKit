@@ -46,7 +46,7 @@ do {
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
     Logger.log(info: "Version: \(pythonVersion)")
     Logger.log(verbose: "Executable: \(sys.executable)")
-    Logger.log(info: "Executable Prefix: \(sys.exec_prefix)")
+    Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
     Logger.log(verbose: "Version String:\n\(sys.version)")
     
     if pathOption.value {
