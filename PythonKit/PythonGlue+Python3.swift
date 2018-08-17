@@ -26,10 +26,8 @@ internal func PyString_FromStringAndSize(_ string: UnsafePointer<Int8>!, _ size:
 }
 
 internal func PySys_SetPath(_ path: UnsafePointer<CChar>!) {
-    let capacity = 4096
-    let widecharPath = UnsafeMutableBufferPointer<wchar_t>.allocate(capacity: capacity)
-    mbstowcs(widecharPath.baseAddress, path, capacity)
-    PySys_SetPath(widecharPath.baseAddress)
-    widecharPath.deallocate()
+    PySys_SetPathUnsafePointer(
+        Py_DecodeLocale(path.baseAddress, UnsafeMutablePointer(bitPattern: 0))
+    )
 }
 #endif
