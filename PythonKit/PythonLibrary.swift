@@ -1,10 +1,28 @@
+//===-- PythonLibrary.swift ------------------------------------*- swift -*-===//
 //
-//  PythonGlue+Functions.swift
-//  DynamicPython
+// This source file is part of the Swift.org open source project
+//
+// Copyright (c) 2014 - 2017 Apple Inc. and the Swift project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See https://swift.org/LICENSE.txt for license information
+// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines an interoperability layer for talking to Python from Swift.
+//
+//===----------------------------------------------------------------------===//
+//
+// The model provided by this file is completely dynamic and does not require
+// invasive compiler support.
+//
+//===----------------------------------------------------------------------===//
 //
 //  Created by Pedro José Pereira Vieito on 23/08/2018.
 //  Copyright © 2018 Pedro José Pereira Vieito. All rights reserved.
 //
+//===----------------------------------------------------------------------===//
 
 import Foundation
 
