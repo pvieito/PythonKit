@@ -20,10 +20,10 @@ $ swift run
 The Python library will be loaded at runtime, `PythonKit` will try to find the more modern Python version available in the system. You can force a given version with the `PYTHON_VERSION` environment variable or an specific Python library path with the `PYTHON_LIBRARY`.
 
 ```
-$ PYTHON_VERSION=2.7 swift run
+$ PYTHON_VERSION=2 swift run
 [*] Python 2.7
 [ ] Version: 2.7.10
-$ PYTHON_VERSION=3 swift run
+$ PYTHON_VERSION=3.5 swift run
 [*] Python 3.5
 [ ] Version: 3.5.2
 $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
