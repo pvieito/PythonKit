@@ -10,15 +10,6 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines an interoperability layer for talking to Python from Swift.
-//
-//===----------------------------------------------------------------------===//
-//
-// The model provided by this file is completely dynamic and does not require
-// invasive compiler support.
-//
-//===----------------------------------------------------------------------===//
-//
 //  Created by Pedro José Pereira Vieito on 23/08/2018.
 //  Copyright © 2018 Pedro José Pereira Vieito. All rights reserved.
 //
