@@ -15,22 +15,6 @@ let package = Package(
     ],
     targets: [
         .target(name: "PythonTool", dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"], path: "PythonTool"),
+        .target(name: "PythonKit", path: "PythonKit"),
     ]
 )
-
-if ProcessInfo.processInfo.environment["PYTHON"] == "2" {
-    package.targets.append(contentsOf:
-        [
-            .target(name: "PythonKit", dependencies: ["Python"], path: "PythonKit"),
-            .systemLibrary(name: "Python", path: "Python", pkgConfig: "python2")
-        ]
-    )
-}
-else {
-    package.targets.append(contentsOf:
-        [
-            .target(name: "PythonKit", dependencies: ["Python3"], path: "PythonKit"),
-            .systemLibrary(name: "Python3", path: "Python3", pkgConfig: "python3")
-        ]
-    )
-}

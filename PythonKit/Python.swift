@@ -19,21 +19,68 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if canImport(Python3) && !PYTHON2
-import Python3
-#elseif canImport(Python)
-import Python
-#else
-#error("No Python module available.")
-#endif
+import Foundation
+
+//===----------------------------------------------------------------------===//
+// Python interface implementation
+//===----------------------------------------------------------------------===//
+
+/// The global Python interface.
+///
+/// You can import Python modules and access Python builtin types and functions
+/// via the `Python` global variable.
+///
+///     import Python
+///     // Import modules.
+///     let os = Python.import("os")
+///     let np = Python.import("numpy")
+///
+///     // Use builtin types and functions.
+///     let list: PythonObject = [1, 2, 3]
+///     print(Python.len.call(with: list)) // Prints 3.
+///     print(Python.type.call(with: list) == Python.list) // Prints true.
+@_fixed_layout
+public let Python = PythonInterface()
+
+/// An interface for Python.
+///
+/// `PythonInterface` allows interaction with Python. It can be used to import
+/// modules and dynamically access Python builtin types and functions.
+/// - Note: It is not intended for `PythonInterface` to be initialized
+///   directly. Instead, please use the global instance of `PythonInterface`
+///   called `Python`.
+@_fixed_layout
+@dynamicMemberLookup
+public struct PythonInterface {
+    /// A dictionary of the Python builtins.
+    public let builtins: PythonObject
+    
+    init() {
+        Py_Initialize()   // Initialize Python
+        builtins = PythonObject(borrowing: PyEval_GetBuiltins())
+    }
+    
+    public func attemptImport(_ name: String) throws -> PythonObject {
+        guard let module = PyImport_ImportModule(name) else {
+            try throwPythonErrorIfPresent()
+            throw PythonError.invalidModule(name)
+        }
+        return PythonObject(owning: module)
+    }
+    
+    public func `import`(_ name: String) -> PythonObject {
+        return try! attemptImport(name)
+    }
+    
+    public subscript(dynamicMember name: String) -> PythonObject {
+        return builtins[name]
+    }
+}
 
 //===----------------------------------------------------------------------===//
 // `PyReference` definition
 //===----------------------------------------------------------------------===//
 
-/// Typealias used when passing or returning a `PyObject` pointer with
-/// implied ownership.
-public typealias OwnedPyObjectPointer = UnsafeMutablePointer<PyObject>
 
 /// A primitive reference to a Python C API `PyObject`.
 ///
@@ -51,7 +98,7 @@ final class PyReference {
         self.pointer = pointer
     }
     
-    init(borrowing pointer: UnsafeMutablePointer<PyObject>) {
+    init(borrowing pointer: UnsafeMutableRawPointer) {
         self.pointer = pointer
         Py_IncRef(pointer)
     }
@@ -60,7 +107,7 @@ final class PyReference {
         Py_DecRef(pointer)
     }
     
-    var borrowedPyObject: UnsafeMutablePointer<PyObject> {
+    var borrowedPyObject: UnsafeMutableRawPointer {
         return pointer
     }
     
@@ -99,16 +146,16 @@ public struct PythonObject {
     }
     
     /// Creates a new instance, taking ownership of the specified `PyObject` pointer.
-    public init(owning pointer: OwnedPyObjectPointer) {
+    init(owning pointer: OwnedPyObjectPointer) {
         reference = PyReference(owning: pointer)
     }
     
     /// Creates a new instance from the specified `PyObject` pointer.
-    public init(borrowing pointer: UnsafeMutablePointer<PyObject>) {
+    public init(borrowing pointer: UnsafeMutableRawPointer) {
         reference = PyReference(borrowing: pointer)
     }
     
-    fileprivate var borrowedPyObject: UnsafeMutablePointer<PyObject> {
+    fileprivate var borrowedPyObject: UnsafeMutableRawPointer {
         return reference.borrowedPyObject
     }
     
@@ -169,7 +216,7 @@ public extension PythonObject {
 /// Internal helpers to convert `PythonConvertible` values to owned and borrowed
 /// `PyObject` instances. These should not be made public.
 fileprivate extension PythonConvertible {
-    var borrowedPyObject: UnsafeMutablePointer<PyObject> {
+    var borrowedPyObject: UnsafeMutableRawPointer {
         return pythonObject.borrowedPyObject
     }
     
@@ -232,14 +279,15 @@ extension PythonError : CustomStringConvertible {
     }
 }
 
+
 // Reflect a Python error (which must be active) into a Swift error if one is
 // active.
 private func throwPythonErrorIfPresent() throws {
     if PyErr_Occurred() == nil { return }
     
-    var type: UnsafeMutablePointer<PyObject>?
-    var value: UnsafeMutablePointer<PyObject>?
-    var traceback: UnsafeMutablePointer<PyObject>?
+    var type: UnsafeMutableRawPointer?
+    var value: UnsafeMutableRawPointer?
+    var traceback: UnsafeMutableRawPointer?
     
     // Fetch the exception and clear the exception state.
     PyErr_Fetch(&type, &value, &traceback)
@@ -630,69 +678,6 @@ public extension PythonObject {
 }
 
 //===----------------------------------------------------------------------===//
-// Python interface implementation
-//===----------------------------------------------------------------------===//
-
-/// The global Python interface.
-///
-/// You can import Python modules and access Python builtin types and functions
-/// via the `Python` global variable.
-///
-///     import Python
-///     // Import modules.
-///     let os = Python.import("os")
-///     let np = Python.import("numpy")
-///
-///     // Use builtin types and functions.
-///     let list: PythonObject = [1, 2, 3]
-///     print(Python.len.call(with: list)) // Prints 3.
-///     print(Python.type.call(with: list) == Python.list) // Prints true.
-@_fixed_layout
-public let Python = PythonInterface()
-
-/// An interface for Python.
-///
-/// `PythonInterface` allows interaction with Python. It can be used to import
-/// modules and dynamically access Python builtin types and functions.
-/// - Note: It is not intended for `PythonInterface` to be initialized
-///   directly. Instead, please use the global instance of `PythonInterface`
-///   called `Python`.
-@_fixed_layout
-@dynamicMemberLookup
-public struct PythonInterface {
-    /// A dictionary of the Python builtins.
-    public let builtins: PythonObject
-    
-    init() {
-        Py_Initialize()   // Initialize Python
-        builtins = PythonObject(borrowing: PyEval_GetBuiltins())
-    }
-    
-    public func attemptImport(_ name: String) throws -> PythonObject {
-        guard let module = PyImport_ImportModule(name) else {
-            try throwPythonErrorIfPresent()
-            throw PythonError.invalidModule(name)
-        }
-        return PythonObject(owning: module)
-    }
-    
-    public func `import`(_ name: String) -> PythonObject {
-        return try! attemptImport(name)
-    }
-    
-    public func updatePath(to path: String) {
-        var cStr = path.utf8CString
-        cStr.withUnsafeMutableBufferPointer { buffPtr in
-            PySys_SetPath(buffPtr.baseAddress)
-        }
-    }
-    
-    public subscript(dynamicMember name: String) -> PythonObject {
-        return builtins[name]
-    }
-}
-
-//===----------------------------------------------------------------------===//
 // Helpers for Python slice and tuple types
 //===----------------------------------------------------------------------===//
 
@@ -769,7 +754,7 @@ public extension PythonObject {
 private func isType(_ object: PythonObject,
                     type: UnsafeMutableRawPointer) -> Bool {
     let typePyRef = PythonObject(
-        borrowing: type.assumingMemoryBound(to: PyObject.self)
+        borrowing: type.assumingMemoryBound(to: PyObjectPointer.self)
     )
     let result = Python.isinstance.call(with: object, typePyRef)
     
@@ -779,22 +764,17 @@ private func isType(_ object: PythonObject,
     defer { Py_DecRef(pyObject) }
     
     // Anything not equal to `Py_ZeroStruct` is truthy.
-    return !(pyObject == &_Py_ZeroStruct)
-}
-
-private func == (_ x: UnsafeMutablePointer<PyObject>,
-                 _ y: UnsafeMutableRawPointer) -> Bool {
-    return x == y.assumingMemoryBound(to: PyObject.self)
+    return false //!(pyObject == &_Py_ZeroStruct)
 }
 
 extension Bool : PythonConvertible {
     public init?(_ pythonObject: PythonObject) {
-        guard isType(pythonObject, type: &PyBool_Type) else { return nil }
+        return nil /*guard isType(pythonObject, type: &PyBool_Type) else { return nil }
         
         let pyObject = pythonObject.ownedPyObject
         defer { Py_DecRef(pyObject) }
         
-        self = pyObject == &_Py_TrueStruct
+        self = pyObject == &_Py_TrueStruct*/
     }
     
     public var pythonObject: PythonObject {
@@ -976,8 +956,8 @@ where Key : PythonConvertible, Value : PythonConvertible {
         
         // Iterate over the Python dictionary, converting its keys and values to
         // Swift `Key` and `Value` pairs.
-        var key, value: UnsafeMutablePointer<PyObject>?
-        var position: Py_ssize_t = 0
+        var key, value: UnsafeMutableRawPointer?
+        var position: Int = 0
         
         while PyDict_Next(pythonDict.borrowedPyObject,
                           &position, &key, &value) != 0 {
@@ -1015,13 +995,14 @@ where Key : PythonConvertible, Value : PythonConvertible {
 
 extension Range : PythonConvertible where Bound : PythonConvertible {
     public init?(_ pythonObject: PythonObject) {
-        guard isType(pythonObject, type: &PySlice_Type) else { return nil }
+        return nil
+        /*guard isType(pythonObject, type: &PySlice_Type) else { return nil }
         guard let lowerBound = Bound(pythonObject.start),
             let upperBound = Bound(pythonObject.stop) else {
                 return nil
         }
         guard pythonObject.step == Python.None else { return nil }
-        self.init(uncheckedBounds: (lowerBound, upperBound))
+        self.init(uncheckedBounds: (lowerBound, upperBound))*/
     }
     
     public var pythonObject: PythonObject {
@@ -1034,13 +1015,14 @@ extension Range : PythonConvertible where Bound : PythonConvertible {
 
 extension PartialRangeFrom : PythonConvertible where Bound : PythonConvertible {
     public init?(_ pythonObject: PythonObject) {
-        guard isType(pythonObject, type: &PySlice_Type) else { return nil }
+        return nil
+        /*guard isType(pythonObject, type: &PySlice_Type) else { return nil }
         guard let lowerBound = Bound(pythonObject.start) else { return nil }
         guard pythonObject.stop == Python.None,
             pythonObject.step == Python.None else {
                 return nil
         }
-        self.init(lowerBound)
+        self.init(lowerBound)*/
     }
     
     public var pythonObject: PythonObject {
@@ -1051,13 +1033,14 @@ extension PartialRangeFrom : PythonConvertible where Bound : PythonConvertible {
 
 extension PartialRangeUpTo : PythonConvertible where Bound : PythonConvertible {
     public init?(_ pythonObject: PythonObject) {
-        guard isType(pythonObject, type: &PySlice_Type) else { return nil }
+        return nil
+        /*guard isType(pythonObject, type: &PySlice_Type) else { return nil }
         guard let upperBound = Bound(pythonObject.stop) else { return nil }
         guard pythonObject.start == Python.None,
             pythonObject.step == Python.None else {
                 return nil
         }
-        self.init(upperBound)
+        self.init(upperBound)*/
     }
     
     public var pythonObject: PythonObject {

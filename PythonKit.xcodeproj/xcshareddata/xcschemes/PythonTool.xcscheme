@@ -75,6 +75,13 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "PYTHONLIBRARYPATH"
+            value = "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/libpython3.7.dylib"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
