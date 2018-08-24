@@ -44,7 +44,7 @@ internal struct PythonLibraryManager {
         let prefixes = [
             "/usr/local" // Homebrew
         ]
-        return prefixes.map { URL(fileURLWithPath: $0) } + FileManager.default.urls(for: .libraryDirectory, in: [.systemDomainMask, .userDomainMask])
+        return FileManager.default.urls(for: .libraryDirectory, in: [.userDomainMask, .systemDomainMask]) + prefixes.map { URL(fileURLWithPath: $0) }
     }()
     
     private static let unprefixedLibraryPaths = [
@@ -53,8 +53,8 @@ internal struct PythonLibraryManager {
     #elseif os(Linux)
     private static let libraryPrefixes: [URL] = {
         let prefixes = [
-            "/usr",
-            "/usr/local"
+            "/usr/local",
+            "/usr"
         ]
         return prefixes.map { URL(fileURLWithPath: $0) }
     }()
