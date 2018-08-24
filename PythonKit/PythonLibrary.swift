@@ -44,7 +44,10 @@ internal struct PythonLibraryManager {
         let prefixes = [
             "/usr/local" // Homebrew
         ]
-        return FileManager.default.urls(for: .libraryDirectory, in: [.userDomainMask, .systemDomainMask]) + prefixes.map { URL(fileURLWithPath: $0) }
+        return FileManager.default.urls(
+            for: .libraryDirectory,
+            in: [.userDomainMask, .systemDomainMask]
+            ) + prefixes.map { URL(fileURLWithPath: $0) }
     }()
     
     private static let unprefixedLibraryPaths = [
@@ -89,7 +92,7 @@ internal struct PythonLibraryManager {
                         
                         let unprefixedPath = unprefixedPath.replacingOccurrences(of: "{version}", with: versionString)
                         let pythonLibrary = prefix.appendingPathComponent(unprefixedPath)
-                                                
+                        
                         if FileManager.default.fileExists(atPath: pythonLibrary.path) {
                             return pythonLibrary.path
                         }
