@@ -37,7 +37,7 @@ internal struct PythonLibraryManager {
     private static let pythonLegacySymbolName = "PyString_AsString"
     
     private static let supportedMajorVersions = 2...3
-    private static let supportedMinorVersions = 0...9
+    private static let supportedMinorVersions = 0...25
     
     #if os(macOS)
     private static let libraryPrefixes: [URL] = {
@@ -77,7 +77,7 @@ internal struct PythonLibraryManager {
             return pythonLibraryPath
         }
         
-        let pythonVersion = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonVersionEnvironmentKey]
+        let requiredPythonVersion = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonVersionEnvironmentKey]
         
         for majorVersion in supportedMajorVersions.reversed() {
             for minorVersion in supportedMinorVersions.reversed() {
@@ -86,13 +86,19 @@ internal struct PythonLibraryManager {
                         
                         let versionString = "\(majorVersion).\(minorVersion)"
                         
-                        if let pythonVersion = pythonVersion, !versionString.hasPrefix(pythonVersion) {
-                            continue
+                        if let requiredPythonVersion = requiredPythonVersion {
+                            let requiredMajorVersion = Int(requiredPythonVersion)
+                            
+                            if requiredPythonVersion != versionString &&
+                                requiredMajorVersion != majorVersion {
+                                continue
+                            }
                         }
                         
                         let unprefixedPath = unprefixedPath.replacingOccurrences(of: "{version}", with: versionString)
                         let pythonLibrary = prefix.appendingPathComponent(unprefixedPath)
                         
+                        print(pythonLibrary.path)
                         if FileManager.default.fileExists(atPath: pythonLibrary.path) {
                             return pythonLibrary.path
                         }
