@@ -98,7 +98,6 @@ internal struct PythonLibraryManager {
                         let unprefixedPath = unprefixedPath.replacingOccurrences(of: "{version}", with: versionString)
                         let pythonLibrary = prefix.appendingPathComponent(unprefixedPath)
                         
-                        print(pythonLibrary.path)
                         if FileManager.default.fileExists(atPath: pythonLibrary.path) {
                             return pythonLibrary.path
                         }
