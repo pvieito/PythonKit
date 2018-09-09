@@ -31,6 +31,8 @@ $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 [ ] Version: 2.7.10
 ```
 
+_NOTE: On macOS, if you use a Python version from Homebrew, link its framework to `/Library/Frameworks` or set the environment variable `DYLD_FRAMEWORK_PATH=/usr/local/Frameworks` so it can be found by the dynamic library loader._
+
 ## Usage
 
 Add the following dependency to your Swift PM `Package.swift` manifest:

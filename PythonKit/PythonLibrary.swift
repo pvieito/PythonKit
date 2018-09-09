@@ -39,69 +39,52 @@ internal struct PythonLibraryManager {
     private static let supportedMajorVersions = 2...3
     private static let supportedMinorVersions = 0...25
     
-    #if os(macOS)
-    private static let libraryPrefixes: [URL] = {
-        let prefixes = [
-            "/usr/local" // Homebrew
+    private static let libraryNames: [String] = {
+        var libraryNames = [
+            "libpython{version}",
+            "libpython{version}m"
         ]
-        return FileManager.default.urls(
-            for: .libraryDirectory,
-            in: [.userDomainMask, .systemDomainMask]
-            ) + prefixes.map { URL(fileURLWithPath: $0) }
-    }()
-    
-    private static let unprefixedLibraryPaths = [
-        "Frameworks/Python.framework/Versions/{version}/Python"
-    ]
-    #elseif os(Linux)
-    private static let libraryPrefixes: [URL] = {
-        let prefixes = [
-            "/usr/local",
-            "/usr"
-        ]
-        return prefixes.map { URL(fileURLWithPath: $0) }
-    }()
-    
-    private static let unprefixedLibraryPaths = [
-        "lib/x86_64-linux-gnu/libpython{version}.so",
-        "lib/x86_64-linux-gnu/libpython{version}m.so",
-        "lib/libpython{version}.so",
-        "lib/libpython{version}m.so"
-    ]
-    #endif
-    
-    static func getPythonLibraryPath() -> String? {
-        let pythonLibraryPath = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonLibraryEnvironmentKey]
         
-        if let pythonLibraryPath = pythonLibraryPath {
-            return pythonLibraryPath
+        #if canImport(Darwin)
+        libraryNames = ["Python.framework/Versions/{version}/Python"] + libraryNames.map { $0 + ".dylib" }
+        #elseif os(Linux)
+        libraryNames = libraryNames.map { $0 + ".so" }
+        #endif
+        
+        return libraryNames
+    }()
+    
+    static func getPythonLibraryPath() -> UnsafeMutableRawPointer? {        
+        let pythonLibraryName = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonLibraryEnvironmentKey]
+        
+        if let pythonLibraryName = pythonLibraryName {
+            return dlopen(pythonLibraryName, RTLD_NOW)
         }
         
         let requiredPythonVersion = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonVersionEnvironmentKey]
         
         for majorVersion in supportedMajorVersions.reversed() {
             for minorVersion in supportedMinorVersions.reversed() {
-                for prefix in libraryPrefixes {
-                    for unprefixedPath in unprefixedLibraryPaths {
+                for libraryName in libraryNames {
+                    
+                    let versionString = "\(majorVersion).\(minorVersion)"
+                    
+                    if let requiredPythonVersion = requiredPythonVersion {
+                        let requiredMajorVersion = Int(requiredPythonVersion)
                         
-                        let versionString = "\(majorVersion).\(minorVersion)"
-                        
-                        if let requiredPythonVersion = requiredPythonVersion {
-                            let requiredMajorVersion = Int(requiredPythonVersion)
-                            
-                            if requiredPythonVersion != versionString &&
-                                requiredMajorVersion != majorVersion {
-                                continue
-                            }
-                        }
-                        
-                        let unprefixedPath = unprefixedPath.replacingOccurrences(of: "{version}", with: versionString)
-                        let pythonLibrary = prefix.appendingPathComponent(unprefixedPath)
-                        
-                        if FileManager.default.fileExists(atPath: pythonLibrary.path) {
-                            return pythonLibrary.path
+                        if requiredPythonVersion != versionString &&
+                            requiredMajorVersion != majorVersion {
+                            continue
                         }
                     }
+                    
+                    let libraryName = libraryName.replacingOccurrences(of: "{version}", with: versionString)
+                    
+                    guard let pythonLibrary = dlopen(libraryName, RTLD_NOW) else {
+                        continue
+                    }
+                    
+                    return pythonLibrary
                 }
             }
         }
@@ -109,19 +92,12 @@ internal struct PythonLibraryManager {
         return nil
     }
     
-    private let pythonLibraryPath: String
     private let pythonLibrary: UnsafeMutableRawPointer
     private let isLegacyPython: Bool
     
     fileprivate init() {
-        guard let pythonLibraryPath = PythonLibraryManager.getPythonLibraryPath() else {
-            fatalError("Python library path not found. Set the \(PythonLibraryManager.pythonLibraryEnvironmentKey) environment variable with the path to the Python Library.")
-        }
-        
-        self.pythonLibraryPath = pythonLibraryPath
-        
-        guard let pythonLibrary = dlopen(pythonLibraryPath, RTLD_NOW) else {
-            fatalError("Python library not available at “\(pythonLibraryPath)”")
+        guard let pythonLibrary = PythonLibraryManager.getPythonLibraryPath() else {
+            fatalError("Python library not found. Set the \(PythonLibraryManager.pythonLibraryEnvironmentKey) environment variable with the path to the Python Library.")
         }
         
         self.pythonLibrary = pythonLibrary
