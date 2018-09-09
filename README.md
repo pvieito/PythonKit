@@ -26,6 +26,9 @@ $ PYTHON_VERSION=2 swift run
 $ PYTHON_VERSION=3.5 swift run
 [*] Python 3.5
 [ ] Version: 3.5.2
+$ PYTHON_LIBRARY=libpython3.5.so swift run
+[*] Python 3.5
+[ ] Version: 3.5.2
 $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 [*] Python 2.7
 [ ] Version: 2.7.10
