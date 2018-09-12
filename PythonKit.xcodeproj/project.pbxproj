@@ -86,7 +86,6 @@
 		AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommandLineKit.xcodeproj; path = ../CommandLineKit/CommandLineKit.xcodeproj; sourceTree = "<group>"; };
 		AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersion.swift; sourceTree = "<group>"; };
 		AAC566D020E0511C00F4C84C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		AAE9EBB0211F0DAF00B0EE03 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../../usr/local/Frameworks/Python.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,7 +119,6 @@
 				AA3BAE06201E92000082CE06 /* PythonKit */,
 				AA3BAE34201E95D10082CE06 /* PythonTool */,
 				AA3BAE05201E92000082CE06 /* Products */,
-				AA63769A201E9E0200D3EE43 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,14 +158,6 @@
 				AA637699201E9DE100D3EE43 /* LoggerKit.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AA63769A201E9E0200D3EE43 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				AAE9EBB0211F0DAF00B0EE03 /* Python.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		AA6376A0201E9EBA00D3EE43 /* Products */ = {
@@ -490,7 +480,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = Python3;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 			};
@@ -517,7 +506,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = Python3;
 				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
