@@ -4,7 +4,7 @@ import Foundation
 import PackageDescription
 
 let package = Package(
-    name: "PythonTool",
+    name: "PythonKit",
     products: [
         .executable(name: "PythonTool", targets: ["PythonTool"]),
         .library(name: "PythonKit", targets: ["PythonKit"]),
