@@ -6,6 +6,36 @@ Swift framework to interact with Python.
 
 `PythonKit` requires a recent [Swift 4.2 toolchain](https://swift.org/download/#swift-42-convergence-snapshots) and has been tested both on macOS and Linux.
 
+## Usage
+
+Some Python code like this:
+
+```python
+import sys
+
+print(f"Python {sys.version_info.major}.{sys.version_info.minor}")
+print(f"Python Version: {sys.version}")
+```
+
+Can be implemented in Swift through PythonKit with the following code:
+
+```swift
+import PythonKit
+
+let sys = try Python.import("sys")
+
+print("Python \(sys.version_info.major).\(sys.version_info.minor)")
+print("Python Version: \(sys.version)")
+```
+
+### Swift Package Manager
+
+Add the following dependency to your `Package.swift` manifest:
+
+```swift
+.package(url: "https://github.com/pvieito/PythonKit.git", .branch("master")),
+```
+
 ## Build
 
 `PythonKit` can be built with Swift PM:
@@ -35,36 +65,6 @@ $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 ```
 
 _NOTE: On macOS, if you use a Python version from Homebrew, link its framework to `/Library/Frameworks` or set the environment variable `DYLD_FRAMEWORK_PATH=/usr/local/Frameworks` so it can be found by the dynamic library loader._
-
-## Usage
-
-Add the following dependency to your Swift PM `Package.swift` manifest:
-
-```swift
-.package(url: "https://github.com/pvieito/PythonKit.git", .branch("master")),
-```
-
-## Example
-
-Some Python code like this:
-
-```python
-import sys
-
-print(f"Python {sys.version_info.major}.{sys.version_info.minor}")
-print(f"Python Version: {sys.version}")
-```
-
-Can be implemented in Swift through PythonKit with the following code:
-
-```swift
-import PythonKit
-
-let sys = try Python.import("sys")
-
-print("Python \(sys.version_info.major).\(sys.version_info.minor)")
-print("Python Version: \(sys.version)")
-```
 
 ## Notes
 
