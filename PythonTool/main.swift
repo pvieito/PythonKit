@@ -59,7 +59,7 @@ do {
             }
         }
         else {
-            Logger.log(warning: "No paths avaliable.")
+            Logger.log(warning: "No paths available.")
         }
     }
     
@@ -79,7 +79,7 @@ do {
             }
         }
         else {
-            Logger.log(warning: "No modules avaliable.")
+            Logger.log(warning: "No modules available.")
         }
     }
 }
