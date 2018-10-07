@@ -4,7 +4,7 @@ Swift framework to interact with Python.
 
 ## Requirements
 
-`PythonKit` requires a recent [Swift 4.2 toolchain](https://swift.org/download/#swift-42-convergence-snapshots) and has been tested both on macOS and Linux.
+`PythonKit` requires a Swift 4.2 or higher and has been tested both on macOS and Linux.
 
 ## Usage
 
