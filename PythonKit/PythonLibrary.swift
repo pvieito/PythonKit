@@ -123,7 +123,7 @@ internal struct PythonLibraryManager {
     }
 }
 
-let Py_Initialize: (@convention(c) () -> ()) = PythonLibrary.getSymbol(
+let Py_Initialize = PythonLibrary.getSymbol(
     name: "Py_Initialize",
     signature: (@convention(c) () -> ()).self
 )

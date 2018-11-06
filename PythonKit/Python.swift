@@ -941,7 +941,7 @@ extension Array : PythonConvertible where Element : PythonConvertible {
         let list = PyList_New(count)!
         for (index, element) in enumerated() {
             // `PyList_SetItem` steals the reference of the object stored.
-            PyList_SetItem(list, index, element.ownedPyObject)
+            let _ = PyList_SetItem(list, index, element.ownedPyObject)
         }
         return PythonObject(owning: list)
     }
