@@ -4,7 +4,7 @@ Swift framework to interact with Python.
 
 ## Requirements
 
-`PythonKit` requires Swift 4.2 or higher and has been tested both on macOS and Linux.
+`PythonKit` requires Swift 5 or higher and has been tested both on macOS and Linux.
 
 ## Usage
 
@@ -15,6 +15,7 @@ import sys
 
 print(f"Python {sys.version_info.major}.{sys.version_info.minor}")
 print(f"Python Version: {sys.version}")
+print(f"Python Encoding: {sys.getdefaultencoding().upper()}")
 ```
 
 Can be implemented in Swift through PythonKit with the following code:
@@ -26,6 +27,7 @@ let sys = try Python.import("sys")
 
 print("Python \(sys.version_info.major).\(sys.version_info.minor)")
 print("Python Version: \(sys.version)")
+print("Python Encoding: \(sys.getdefaultencoding().upper())")
 ```
 
 ### Swift Package Manager
@@ -63,8 +65,6 @@ $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 [*] Python 2.7
 [ ] Version: 2.7.10
 ```
-
-_NOTE: On macOS, if you use a Python version from Homebrew, link its framework to `/Library/Frameworks` or set the environment variable `DYLD_FRAMEWORK_PATH=/usr/local/Frameworks` so it can be found by the dynamic library loader._
 
 ## Notes
 

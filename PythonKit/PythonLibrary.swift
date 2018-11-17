@@ -1,8 +1,8 @@
-//===-- PythonLibrary.swift -----------------------------------------------===//
+//===-- Python.swift ------------------------------------------*- swift -*-===//
 //
 // This source file is part of the Swift.org open source project
 //
-// Copyright (c) 2014 - 2017 Apple Inc. and the Swift project authors
+// Copyright (c) 2014 - 2018 Apple Inc. and the Swift project authors
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See https://swift.org/LICENSE.txt for license information
@@ -10,112 +10,55 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  Created by Pedro José Pereira Vieito on 23/08/2018.
-//  Copyright © 2018 Pedro José Pereira Vieito. All rights reserved.
+// This file implements the logic for dynamically loading Python at runtime.
 //
 //===----------------------------------------------------------------------===//
 
-import Foundation
+#if canImport(Darwin)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
 
-let Py_LT: Int32 = 0
-let Py_LE: Int32 = 1
-let Py_EQ: Int32 = 2
-let Py_NE: Int32 = 3
-let Py_GT: Int32 = 4
-let Py_GE: Int32 = 5
+//===----------------------------------------------------------------------===//
+// The `PythonLibrary` struct that loads Python symbols at runtime.
+//===----------------------------------------------------------------------===//
 
-typealias OwnedPyObjectPointer = UnsafeMutableRawPointer
-typealias PyObjectPointer = UnsafeMutableRawPointer
-typealias CCharPointer = UnsafePointer<Int8>
-
-internal let PythonLibrary = PythonLibraryManager()
-
-internal struct PythonLibraryManager {
+struct PythonLibrary {
     
-    private static let pythonLibraryEnvironmentKey = "PYTHON_LIBRARY"
-    private static let pythonVersionEnvironmentKey = "PYTHON_VERSION"
+    private static let shared = PythonLibrary()
     private static let pythonLegacySymbolName = "PyString_AsString"
     
-    private static let supportedMajorVersions = 2...3
-    private static let supportedMinorVersions = 0...25
-    
-    private static let libraryNames: [String] = {
-        var libraryNames = [
-            "libpython{version}",
-            "libpython{version}m"
-        ]
-        
-        #if canImport(Darwin)
-        libraryNames = ["Python.framework/Versions/{version}/Python"] + libraryNames.map { $0 + ".dylib" }
-        #elseif os(Linux)
-        libraryNames = libraryNames.map { $0 + ".so" }
-        #endif
-        
-        return libraryNames
-    }()
-    
-    static func getPythonLibraryPath() -> UnsafeMutableRawPointer? {        
-        let pythonLibraryName = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonLibraryEnvironmentKey]
-        
-        if let pythonLibraryName = pythonLibraryName {
-            return dlopen(pythonLibraryName, RTLD_NOW)
-        }
-        
-        let requiredPythonVersion = ProcessInfo.processInfo.environment[PythonLibraryManager.pythonVersionEnvironmentKey]
-        
-        for majorVersion in supportedMajorVersions.reversed() {
-            for minorVersion in supportedMinorVersions.reversed() {
-                for libraryName in libraryNames {
-                    
-                    let versionString = "\(majorVersion).\(minorVersion)"
-                    
-                    if let requiredPythonVersion = requiredPythonVersion {
-                        let requiredMajorVersion = Int(requiredPythonVersion)
-                        
-                        if requiredPythonVersion != versionString &&
-                            requiredMajorVersion != majorVersion {
-                            continue
-                        }
-                    }
-                    
-                    let libraryName = libraryName.replacingOccurrences(of: "{version}", with: versionString)
-                    
-                    guard let pythonLibrary = dlopen(libraryName, RTLD_NOW) else {
-                        continue
-                    }
-                    
-                    return pythonLibrary
-                }
-            }
-        }
-        
-        return nil
-    }
-    
-    private let pythonLibrary: UnsafeMutableRawPointer
+    private let pythonLibraryHandle: UnsafeMutableRawPointer
     private let isLegacyPython: Bool
-    
+
     fileprivate init() {
-        guard let pythonLibrary = PythonLibraryManager.getPythonLibraryPath() else {
-            fatalError("Python library not found. Set the \(PythonLibraryManager.pythonLibraryEnvironmentKey) environment variable with the path to the Python Library.")
+        guard let pythonLibraryHandle = PythonLibrary.getPythonLibraryHandle() else {
+            fatalError(
+                "Python library not found. Set the \(Environment.library.key) " +
+                "environment variable with the path to the Python Library."
+            )
         }
         
-        self.pythonLibrary = pythonLibrary
+        self.pythonLibraryHandle = pythonLibraryHandle
         
-        // Check if Python is legacy (before Python 3)
-        let legacySymbol = dlsym(pythonLibrary, PythonLibraryManager.pythonLegacySymbolName)
-        self.isLegacyPython = legacySymbol != nil
+        // Check if Python is legacy (Python 2)
+        self.isLegacyPython = dlsym(pythonLibraryHandle, PythonLibrary.pythonLegacySymbolName) != nil
+        
+        if self.isLegacyPython {
+            PythonLibrary.log(message: "Loaded legacy Python library, using legacy symbols...")
+        }
     }
     
-    internal func getSymbol<T>(name: String, legacyName: String? = nil, signature: T.Type) -> T {
+    static func getSymbol<T>(name: String, legacyName: String? = nil, signature: T.Type) -> T {
         var name = name
         
-        if let legacyName = legacyName, self.isLegacyPython {
+        if let legacyName = legacyName, PythonLibrary.shared.isLegacyPython {
             name = legacyName
         }
         
         let symbol = unsafeBitCast(
-            dlsym(pythonLibrary, name),
+            dlsym(PythonLibrary.shared.pythonLibraryHandle, name),
             to: signature
         )
         
@@ -123,178 +66,135 @@ internal struct PythonLibraryManager {
     }
 }
 
-let Py_Initialize = PythonLibrary.getSymbol(
-    name: "Py_Initialize",
-    signature: (@convention(c) () -> ()).self
-)
+/// Methods of `PythonLibrary` required to load the Python library.
+extension PythonLibrary {
+    
+    private static let supportedMajorVersions: [Int] = Array(2...3).reversed()
+    private static let supportedMinorVersions: [Int?] = [nil] + Array(0...30).reversed()
+    
+    private static let libraryPathVersionCharacter: Character = ":"
+    
+    #if canImport(Darwin)
+    private static var libraryNames = ["Python.framework/Versions/:/Python"]
+    private static var libraryPathExtensions = [""]
+    private static var librarySearchPaths = ["", "/usr/local/Frameworks/"]
+    #elseif os(Linux)
+    private static var libraryNames = ["libpython:", "libpython:m"]
+    private static var libraryPathExtensions = [".so"]
+    private static var librarySearchPaths = [""]
+    #endif
+    
+    private static let libraryPaths: [String] = {
+        var libraryPaths: [String] = []
+        
+        for librarySearchPath in librarySearchPaths {
+            for libraryName in libraryNames {
+                for libraryPathExtension in libraryPathExtensions {
+                    let libraryPath =
+                        librarySearchPath + libraryName + libraryPathExtension
+                    libraryPaths.append(libraryPath)
+                }
+            }
+        }
+        
+        return libraryPaths
+    }()
+    
+    private static func loadPythonLibrary(
+        at path: String, majorVersion: Int, minorVersion: Int? = nil) -> UnsafeMutableRawPointer? {
+        
+        var versionString = String(majorVersion)
+        
+        if let minorVersion = minorVersion {
+            versionString += ".\(minorVersion)"
+        }
+        
+        if let requiredPythonVersion = Environment.version.value {
+            let requiredMajorVersion = Int(requiredPythonVersion)
+            
+            if requiredPythonVersion != versionString &&
+                requiredMajorVersion != majorVersion {
+                return nil
+            }
+        }
+        
+        let path = path.split(separator: libraryPathVersionCharacter)
+            .joined(separator: versionString)
+        
+        return loadPythonLibrary(at: path)
+    }
+    
+    private static func loadPythonLibrary(at path: String) -> UnsafeMutableRawPointer? {
+        log(message: "Trying to load library at '\(path)'... ")
+        
+        let pythonLibraryHandle = dlopen(path, RTLD_NOW)
+        
+        if pythonLibraryHandle != nil {
+            log(message: "Library at '\(path)' was sucessfully loaded.")
+        }
+        
+        return pythonLibraryHandle
+    }
+    
+    private static func getPythonLibraryHandle() -> UnsafeMutableRawPointer? {
+        if let pythonLibraryPath = Environment.library.value {
+            return loadPythonLibrary(at: pythonLibraryPath)
+        }
+        
+        for majorVersion in supportedMajorVersions {
+            for minorVersion in supportedMinorVersions {
+                for libraryPath in libraryPaths {
+                    
+                    guard let pythonLibraryHandle = loadPythonLibrary(
+                        at: libraryPath, majorVersion: majorVersion, minorVersion: minorVersion) else {
+                            continue
+                    }
+                    
+                    return pythonLibraryHandle
+                }
+            }
+        }
+        
+        return nil
+    }
+}
 
-let Py_IncRef = PythonLibrary.getSymbol(
-    name: "Py_IncRef",
-    signature: (@convention(c) (PyObjectPointer?) -> ()).self
-)
+/// Methods of `PythonLibrary` used for logging messages.
+extension PythonLibrary {
 
-let Py_DecRef = PythonLibrary.getSymbol(
-    name: "Py_DecRef",
-    signature: (@convention(c) (PyObjectPointer?) -> ()).self
-)
+    static func log(message: String) {
+        guard Environment.loaderLogging.value != nil else {
+            return
+        }
+        
+        fputs(message + "\n", stderr)
+    }
+}
 
-let PyImport_ImportModule = PythonLibrary.getSymbol(
-    name: "PyImport_ImportModule",
-    signature: (@convention(c) (CCharPointer) -> PyObjectPointer?).self
-)
+/// Methods of `PythonLibrary` required to read the environment variables.
+extension PythonLibrary {
+    
+    enum Environment: String {
+        private static let pythonEnvironmentKeyPrefix = "PYTHON"
+        private static let pythonEnvironmentKeySeparator = "_"
 
-let PyEval_GetBuiltins = PythonLibrary.getSymbol(
-    name: "PyEval_GetBuiltins",
-    signature: (@convention(c) () -> PyObjectPointer).self
-)
-
-let PyErr_Occurred = PythonLibrary.getSymbol(
-    name: "PyErr_Occurred",
-    signature: (@convention(c) () -> PyObjectPointer?).self
-)
-
-let PyErr_Clear = PythonLibrary.getSymbol(
-    name: "PyErr_Clear",
-    signature: (@convention(c) () -> ()).self
-)
-
-let PyErr_Fetch = PythonLibrary.getSymbol(
-    name: "PyErr_Fetch",
-    signature: (@convention(c) (
-        UnsafeMutablePointer<PyObjectPointer?>,
-        UnsafeMutablePointer<PyObjectPointer?>,
-        UnsafeMutablePointer<PyObjectPointer?>
-        ) -> ()).self
-)
-
-let PyDict_New = PythonLibrary.getSymbol(
-    name: "PyDict_New",
-    signature: (@convention(c) () -> PyObjectPointer?).self
-)
-
-let PyDict_SetItem = PythonLibrary.getSymbol(
-    name: "PyDict_SetItem",
-    signature: (@convention(c) (PyObjectPointer?, PyObjectPointer, PyObjectPointer) -> ()).self
-)
-
-let PyObject_GetItem = PythonLibrary.getSymbol(
-    name: "PyObject_GetItem",
-    signature: (@convention(c) (PyObjectPointer, PyObjectPointer) -> PyObjectPointer?).self
-)
-
-let PyObject_SetItem = PythonLibrary.getSymbol(
-    name: "PyObject_SetItem",
-    signature: (@convention(c) (PyObjectPointer, PyObjectPointer, PyObjectPointer) -> ()).self
-)
-
-let PyObject_DelItem = PythonLibrary.getSymbol(
-    name: "PyObject_DelItem",
-    signature: (@convention(c) (PyObjectPointer, PyObjectPointer) -> ()).self
-)
-
-let PyObject_Call = PythonLibrary.getSymbol(
-    name: "PyObject_Call",
-    signature: (@convention(c) (PyObjectPointer, PyObjectPointer, PyObjectPointer?) -> (PyObjectPointer?)).self
-)
-
-let PyObject_GetAttrString = PythonLibrary.getSymbol(
-    name: "PyObject_GetAttrString",
-    signature: (@convention(c) (PyObjectPointer, CCharPointer) -> (PyObjectPointer?)).self
-)
-
-let PyObject_SetAttrString = PythonLibrary.getSymbol(
-    name: "PyObject_SetAttrString",
-    signature: (@convention(c) (PyObjectPointer, CCharPointer, PyObjectPointer) -> (Int)).self
-)
-
-let PySlice_New = PythonLibrary.getSymbol(
-    name: "PySlice_New",
-    signature: (@convention(c) (PyObjectPointer?, PyObjectPointer?, PyObjectPointer?) -> (PyObjectPointer?)).self
-)
-
-let PyTuple_New = PythonLibrary.getSymbol(
-    name: "PyTuple_New",
-    signature: (@convention(c) (Int) -> (PyObjectPointer?)).self
-)
-
-let PyTuple_SetItem = PythonLibrary.getSymbol(
-    name: "PyTuple_SetItem",
-    signature: (@convention(c) (PyObjectPointer, Int, PyObjectPointer) -> ()).self
-)
-
-let PyObject_RichCompareBool = PythonLibrary.getSymbol(
-    name: "PyObject_RichCompareBool",
-    signature: (@convention(c) (PyObjectPointer, PyObjectPointer, Int32) -> (Int32)).self
-)
-
-let PyDict_Next = PythonLibrary.getSymbol(
-    name: "PyDict_Next",
-    signature: (@convention(c) (
-        PyObjectPointer,
-        UnsafeMutablePointer<Int>,
-        UnsafeMutablePointer<PyObjectPointer?>,
-        UnsafeMutablePointer<PyObjectPointer?>
-        ) -> (Int32)).self
-)
-
-let PyList_New = PythonLibrary.getSymbol(
-    name: "PyList_New",
-    signature: (@convention(c) (Int) -> (PyObjectPointer?)).self
-)
-
-let PyList_SetItem = PythonLibrary.getSymbol(
-    name: "PyList_SetItem",
-    signature: (@convention(c) (PyObjectPointer, Int, PyObjectPointer) -> (Int32)).self
-)
-
-let PyBool_FromLong = PythonLibrary.getSymbol(
-    name: "PyBool_FromLong",
-    signature: (@convention(c) (Int) -> (PyObjectPointer)).self
-)
-
-
-let PyFloat_AsDouble = PythonLibrary.getSymbol(
-    name: "PyFloat_AsDouble",
-    signature: (@convention(c) (PyObjectPointer) -> (Double)).self
-)
-
-let PyFloat_FromDouble = PythonLibrary.getSymbol(
-    name: "PyFloat_FromDouble",
-    signature: (@convention(c) (Double) -> (PyObjectPointer)).self
-)
-
-let PyInt_AsLong = PythonLibrary.getSymbol(
-    name: "PyLong_AsLong",
-    legacyName: "PyInt_AsLong",
-    signature: (@convention(c) (PyObjectPointer) -> (Int)).self
-)
-
-let PyInt_FromLong = PythonLibrary.getSymbol(
-    name: "PyLong_FromLong",
-    legacyName: "PyInt_FromLong",
-    signature: (@convention(c) (Int) -> (PyObjectPointer)).self
-)
-
-let PyInt_AsUnsignedLongMask = PythonLibrary.getSymbol(
-    name: "PyLong_AsUnsignedLongMask",
-    legacyName: "PyInt_AsUnsignedLongMask",
-    signature: (@convention(c) (PyObjectPointer) -> (UInt)).self
-)
-
-let PyInt_FromSize_t = PythonLibrary.getSymbol(
-    name: "PyInt_FromLong",
-    legacyName: "PyInt_FromSize_t",
-    signature: (@convention(c) (Int) -> (PyObjectPointer)).self
-)
-
-let PyString_AsString = PythonLibrary.getSymbol(
-    name: "PyUnicode_AsUTF8",
-    legacyName: "PyString_AsString",
-    signature: (@convention(c) (PyObjectPointer) -> (CCharPointer?)).self
-)
-
-let PyString_FromStringAndSize = PythonLibrary.getSymbol(
-    name: "PyUnicode_DecodeUTF8",
-    legacyName: "PyString_FromStringAndSize",
-    signature: (@convention(c) (CCharPointer?, Int) -> (PyObjectPointer?)).self
-)
+        case library = "LIBRARY"
+        case version = "VERSION"
+        case loaderLogging = "LOADER_LOGGING"
+        
+        var key: String {
+            return [Environment.pythonEnvironmentKeyPrefix, self.rawValue]
+                .joined(separator: Environment.pythonEnvironmentKeySeparator)
+        }
+        
+        var value: String? {
+            let optionalValue = getenv(self.key)
+            
+            guard let value = optionalValue else {
+                return nil
+            }
+            
+            return String(cString: value)
+        }
+    }
+}

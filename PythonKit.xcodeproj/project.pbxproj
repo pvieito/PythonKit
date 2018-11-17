@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA0B0EF5219F030700F8FFED /* NumpyConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0B0EF4219F030700F8FFED /* NumpyConversion.swift */; };
+		AA0B0EF821A043C000F8FFED /* PythonLibrary+Symbols.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0B0EF721A043C000F8FFED /* PythonLibrary+Symbols.swift */; };
 		AA3BAE36201E95D10082CE06 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE35201E95D10082CE06 /* main.swift */; };
 		AA4C12C1212F0B6A00E855A9 /* Python.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA3BAE0F201E920D0082CE06 /* Python.swift */; };
 		AA4C12D4212F522000E855A9 /* PythonLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4C12D0212F0C8600E855A9 /* PythonLibrary.swift */; };
@@ -74,6 +76,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA0B0EF4219F030700F8FFED /* NumpyConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumpyConversion.swift; sourceTree = "<group>"; };
+		AA0B0EF721A043C000F8FFED /* PythonLibrary+Symbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PythonLibrary+Symbols.swift"; sourceTree = "<group>"; };
 		AA37F4FF203A392F0084591C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		AA3BAE04201E92000082CE06 /* PythonKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PythonKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA3BAE08201E92000082CE06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -136,6 +140,8 @@
 			children = (
 				AA3BAE0F201E920D0082CE06 /* Python.swift */,
 				AA4C12D0212F0C8600E855A9 /* PythonLibrary.swift */,
+				AA0B0EF721A043C000F8FFED /* PythonLibrary+Symbols.swift */,
+				AA0B0EF4219F030700F8FFED /* NumpyConversion.swift */,
 				AA3BAE08201E92000082CE06 /* Info.plist */,
 			);
 			path = PythonKit;
@@ -309,7 +315,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA4C12D4212F522000E855A9 /* PythonLibrary.swift in Sources */,
+				AA0B0EF821A043C000F8FFED /* PythonLibrary+Symbols.swift in Sources */,
 				AA4C12C1212F0B6A00E855A9 /* Python.swift in Sources */,
+				AA0B0EF5219F030700F8FFED /* NumpyConversion.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
