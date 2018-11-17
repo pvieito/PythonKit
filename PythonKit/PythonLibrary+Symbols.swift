@@ -10,7 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines the Python symbols required for the interop layer.
+// This file defines the Python symbols required for the interoperability layer.
 //
 //===----------------------------------------------------------------------===//
 
