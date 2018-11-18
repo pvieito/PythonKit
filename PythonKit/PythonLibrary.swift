@@ -146,7 +146,6 @@ extension PythonLibrary {
             majorVersion: majorVersion, minorVersion: minorVersion) else {
               continue
           }
-          
           return pythonLibraryHandle
         }
       }
