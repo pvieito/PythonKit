@@ -37,11 +37,12 @@ Logger.logLevel = verboseOption.value ? .debug : .info
 
 do {
     let sys = try Python.attemptImport("sys")
-        
-    let pythonVersion =
-        OperatingSystemVersion(majorVersion: Int(sys.version_info.major) ?? 0,
-                               minorVersion: Int(sys.version_info.minor) ?? 0,
-                               patchVersion: Int(sys.version_info.micro) ?? 0)
+
+    let pythonVersion = OperatingSystemVersion(
+        majorVersion: Int(sys.version_info.major) ?? 0,
+        minorVersion: Int(sys.version_info.minor) ?? 0,
+        patchVersion: Int(sys.version_info.micro) ?? 0
+    )
     
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
     Logger.log(info: "Version: \(pythonVersion)")
