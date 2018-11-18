@@ -34,10 +34,10 @@ struct PythonLibrary {
   fileprivate init() {
     guard let pythonLibraryHandle =
       PythonLibrary.getPythonLibraryHandle() else {
-      fatalError(
-        "Python library not found. Set the \(Environment.library.key)" +
-        "environment variable with the path to the Python Library."
-      )
+      fatalError("""
+        Python library not found. Set the \(Environment.library.key) \
+        environment variable with the path to the Python Library.
+      """)
     }
     
     self.pythonLibraryHandle = pythonLibraryHandle
