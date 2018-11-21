@@ -127,7 +127,8 @@ private extension PythonLibrary {
 // Methods of `PythonLibrary` required to load the Python library.
 private extension PythonLibrary {
   static let supportedMajorVersions: [Int] = [3, 2]
-  
+  static let triedMinorVersions: [Int?] = [nil] + Array(0...30).reversed()
+
   static let libraryPathVersionCharacter: Character = ":"
   
   #if canImport(Darwin)
@@ -159,7 +160,6 @@ private extension PythonLibrary {
       return loadPythonLibrary(at: pythonLibraryPath)
     }
     
-    let triedMinorVersions: [Int?] = [nil] + Array(0...30).reversed()
     for majorVersion in supportedMajorVersions {
       for minorVersion in triedMinorVersions {
         for libraryPath in libraryPaths {
