@@ -15,5 +15,6 @@ let package = Package(
     targets: [
         .target(name: "PythonTool", dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"], path: "PythonTool"),
         .target(name: "PythonKit", path: "PythonKit"),
-    ]
+    ],
+    swiftLanguageVersions: [.v4_2]
 )
