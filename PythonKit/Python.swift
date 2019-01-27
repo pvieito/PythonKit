@@ -125,9 +125,9 @@ extension PythonObject : CustomStringConvertible {
 }
 
 // Make `PythonObject` show up nicely in the Xcode Playground results sidebar.
-extension PythonObject : CustomPlaygroundDisplayConvertible {
-  public var playgroundDescription: Any {
-    return description
+extension PythonObject : CustomPlaygroundQuickLookable {
+  public var customPlaygroundQuickLook: PlaygroundQuickLook {
+    return .text(description)
   }
 }
 
@@ -318,7 +318,7 @@ public struct ThrowingPythonObject {
   @discardableResult
   public func dynamicallyCall(
     withKeywordArguments args:
-      KeyValuePairs<String, PythonConvertible> = [:]
+      DictionaryLiteral<String, PythonConvertible> = [:]
   ) throws -> PythonObject {
     // Make sure there are no state errors.
     if PyErr_Occurred() != nil {
@@ -610,7 +610,7 @@ public extension PythonObject {
   @discardableResult
   func dynamicallyCall(
     withKeywordArguments args:
-      KeyValuePairs<String, PythonConvertible> = [:]
+      DictionaryLiteral<String, PythonConvertible> = [:]
   ) -> PythonObject {
     return try! throwing.dynamicallyCall(withKeywordArguments: args)
   }
