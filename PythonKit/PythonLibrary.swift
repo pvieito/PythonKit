@@ -199,7 +199,7 @@ private extension PythonLibrary {
   
   static func loadPythonLibrary(
     at path: String, version: PythonVersion
-    ) -> UnsafeMutableRawPointer? {
+  ) -> UnsafeMutableRawPointer? {
     let versionString = version.versionString
     
     if let requiredPythonVersion = Environment.version.value {
