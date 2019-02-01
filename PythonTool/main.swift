@@ -36,19 +36,20 @@ Logger.logMode = .commandLine
 Logger.logLevel = verboseOption.value ? .debug : .info
 
 do {
-    let sys = try Python.attemptImport("sys")
-
     let pythonVersion = OperatingSystemVersion(
-        majorVersion: Int(sys.version_info.major) ?? 0,
-        minorVersion: Int(sys.version_info.minor) ?? 0,
-        patchVersion: Int(sys.version_info.micro) ?? 0
+        majorVersion: Int(Python.versionInfo.major) ?? 0,
+        minorVersion: Int(Python.versionInfo.minor) ?? 0,
+        patchVersion: Int(Python.versionInfo.micro) ?? 0
     )
     
     Logger.log(important: "Python \(pythonVersion.shortVersion)")
     Logger.log(info: "Version: \(pythonVersion)")
+    Logger.log(verbose: "Version String: \(Python.version.splitlines()[0])")
+
+    let sys = try Python.attemptImport("sys")
+    
     Logger.log(verbose: "Executable: \(sys.executable)")
     Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
-    Logger.log(verbose: "Version String:\n\(sys.version)")
     
     if pathOption.value {
         
