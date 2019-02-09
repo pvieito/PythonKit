@@ -59,7 +59,10 @@ public struct PythonLibrary {
     #if canImport(Darwin) || canImport(Glibc)
     return dlsym(libraryHandle, name)
     #elseif os(Windows)
-    return GetProcAddress(libraryHandle, name)
+    let moduleHandle = libraryHandle
+        .assumingMemoryBound(to: HINSTANCE__.self)
+    let moduleSymbol = GetProcAddress(moduleHandle, name)
+    return unsafeBitCast(moduleSymbol, to: UnsafeMutableRawPointer?.self)
     #endif
   }
   
@@ -225,7 +228,7 @@ private extension PythonLibrary {
     // modules may depend on this .so file.
     let pythonLibraryHandle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL)
     #elseif os(Windows)
-    let pythonLibraryHandle = LoadLibraryA(path)
+    let pythonLibraryHandle = UnsafeMutableRawPointer(LoadLibraryA(path))
     #endif
     
     if pythonLibraryHandle != nil {
