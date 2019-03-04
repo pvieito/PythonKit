@@ -21,6 +21,10 @@ let package = Package(
         .target(
             name: "PythonKit",
             path: "PythonKit"
-        )
+        ),
+        .testTarget(
+            name: "PythonKitTests",
+            dependencies: ["PythonKit"]
+        ),
     ]
 )
