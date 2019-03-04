@@ -320,7 +320,7 @@ public struct ThrowingPythonObject {
   @discardableResult
   public func dynamicallyCall(
     withKeywordArguments args:
-      DictionaryLiteral<String, PythonConvertible> = [:]
+      KeyValuePairs<String, PythonConvertible> = [:]
   ) throws -> PythonObject {
     // Make sure there are no state errors.
     if PyErr_Occurred() != nil {
@@ -612,7 +612,7 @@ public extension PythonObject {
   @discardableResult
   func dynamicallyCall(
     withKeywordArguments args:
-      DictionaryLiteral<String, PythonConvertible> = [:]
+      KeyValuePairs<String, PythonConvertible> = [:]
   ) -> PythonObject {
     return try! throwing.dynamicallyCall(withKeywordArguments: args)
   }
