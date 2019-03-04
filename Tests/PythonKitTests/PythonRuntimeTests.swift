@@ -5,15 +5,15 @@ import PythonKit
 
 class PythonRuntimeTests: XCTestCase {
 
-  override func setUp() {
+  override class func setUp() {
     super.setUp()
-    PythonLibrary.useVersion(2, 7)
+    PythonLibrary.useVersion(3, 7)
   }
 
   func testCheckVersion() {
-    XCTAssertEqual("2.7.", String(Python.version)!.prefix(4))
+    XCTAssertEqual("3.7.", String(Python.version)!.prefix(4))
     let versionInfo = Python.versionInfo
-    XCTAssertEqual(2, versionInfo.major)
+    XCTAssertEqual(3, versionInfo.major)
     XCTAssertEqual(7, versionInfo.minor)
   }
 
@@ -22,7 +22,7 @@ class PythonRuntimeTests: XCTestCase {
     XCTAssertEqual("[0, 1, 2]", list.description)
     XCTAssertEqual(3, Python.len(list))
     XCTAssertEqual("[0, 1, 2]", Python.str(list))
-    XCTAssertEqual("<type 'list'>", Python.str(Python.type(list)))
+    XCTAssertEqual("<class 'list'>", Python.str(Python.type(list)))
 
     let polymorphicList = PythonObject(["a", 2, true, 1.5])
     XCTAssertEqual("a", polymorphicList[0])
@@ -128,12 +128,6 @@ class PythonRuntimeTests: XCTestCase {
     XCTAssertEqual([-1, 0, 0, 1, 10], array.sorted())
     let list: PythonObject = [-1, 10, 1, 0, 0]
     XCTAssertEqual([-1, 0, 0, 1, 10], list.sorted())
-
-    // Heterogeneous array/list.
-    let array2: [PythonObject] = ["a", 10, "b", "b", 0]
-    XCTAssertEqual([0, 10, "a", "b", "b"], array2.sorted())
-    let list2: PythonObject = ["a", 10, "b", "b", 0]
-    XCTAssertEqual([0, 10, "a", "b", "b"], list2.sorted())
   }
 
   func testHashable() {
