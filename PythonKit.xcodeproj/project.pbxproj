@@ -16,6 +16,9 @@
 		AA63769B201E9E0200D3EE43 /* LoggerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA637697201E9DE100D3EE43 /* LoggerKit.framework */; };
 		AA6376A8201E9EDB00D3EE43 /* CommandLineKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA6376A4201E9EBA00D3EE43 /* CommandLineKit.framework */; };
 		AA6376AC201E9F7100D3EE43 /* OperatingSystemVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */; };
+		AA9F084E222F041D00245ED0 /* PythonKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA3BAE04201E92000082CE06 /* PythonKit.framework */; };
+		AA9F085A222F056900245ED0 /* PythonRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9F0858222F056800245ED0 /* PythonRuntimeTests.swift */; };
+		AA9F085B222F056900245ED0 /* NumpyConversionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9F0859222F056800245ED0 /* NumpyConversionTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +49,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 5D06884319674D7D00BBFAAC;
 			remoteInfo = CommandLineKit;
+		};
+		AA9F084F222F041D00245ED0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA3BADFB201E92000082CE06 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA3BAE03201E92000082CE06;
+			remoteInfo = PythonKit;
+		};
+		AA9F0854222F041D00245ED0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AABB3B53220FB42A00DEE6F4;
+			remoteInfo = CommandLineKitTests;
 		};
 		AAF3192220BF3261008F1CAA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -89,6 +106,10 @@
 		AA637691201E9DE100D3EE43 /* LoggerKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LoggerKit.xcodeproj; path = ../LoggerKit/LoggerKit.xcodeproj; sourceTree = "<group>"; };
 		AA63769F201E9EBA00D3EE43 /* CommandLineKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CommandLineKit.xcodeproj; path = ../CommandLineKit/CommandLineKit.xcodeproj; sourceTree = "<group>"; };
 		AA6376AB201E9F7100D3EE43 /* OperatingSystemVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersion.swift; sourceTree = "<group>"; };
+		AA9F0849222F041D00245ED0 /* PythonKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PythonKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA9F084D222F041D00245ED0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA9F0858222F056800245ED0 /* PythonRuntimeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PythonRuntimeTests.swift; sourceTree = "<group>"; };
+		AA9F0859222F056800245ED0 /* NumpyConversionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumpyConversionTests.swift; sourceTree = "<group>"; };
 		AAC566D020E0511C00F4C84C /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +131,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA9F0846222F041D00245ED0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA9F084E222F041D00245ED0 /* PythonKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -122,6 +151,7 @@
 				AAC566D020E0511C00F4C84C /* Package.swift */,
 				AA3BAE06201E92000082CE06 /* PythonKit */,
 				AA3BAE34201E95D10082CE06 /* PythonTool */,
+				AA9F084A222F041D00245ED0 /* PythonKitTests */,
 				AA3BAE05201E92000082CE06 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -131,6 +161,7 @@
 			children = (
 				AA3BAE04201E92000082CE06 /* PythonKit.framework */,
 				AA3BAE33201E95D10082CE06 /* PythonTool */,
+				AA9F0849222F041D00245ED0 /* PythonKitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -170,8 +201,20 @@
 			isa = PBXGroup;
 			children = (
 				AA6376A4201E9EBA00D3EE43 /* CommandLineKit.framework */,
+				AA9F0855222F041D00245ED0 /* CommandLineKitTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA9F084A222F041D00245ED0 /* PythonKitTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA9F0858222F056800245ED0 /* PythonRuntimeTests.swift */,
+				AA9F0859222F056800245ED0 /* NumpyConversionTests.swift */,
+				AA9F084D222F041D00245ED0 /* Info.plist */,
+			);
+			name = PythonKitTests;
+			path = Tests/PythonKitTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,24 +268,47 @@
 			productReference = AA3BAE33201E95D10082CE06 /* PythonTool */;
 			productType = "com.apple.product-type.tool";
 		};
+		AA9F0848222F041D00245ED0 /* PythonKitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA9F0857222F041D00245ED0 /* Build configuration list for PBXNativeTarget "PythonKitTests" */;
+			buildPhases = (
+				AA9F0845222F041D00245ED0 /* Sources */,
+				AA9F0846222F041D00245ED0 /* Frameworks */,
+				AA9F0847222F041D00245ED0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA9F0850222F041D00245ED0 /* PBXTargetDependency */,
+			);
+			name = PythonKitTests;
+			productName = PythonKitTests;
+			productReference = AA9F0849222F041D00245ED0 /* PythonKitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		AA3BADFB201E92000082CE06 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0920;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Pedro José Pereira Vieito";
 				TargetAttributes = {
 					AA3BAE03201E92000082CE06 = {
 						CreatedOnToolsVersion = 9.2;
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					AA3BAE32201E95D10082CE06 = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1000;
+						ProvisioningStyle = Automatic;
+					};
+					AA9F0848222F041D00245ED0 = {
+						CreatedOnToolsVersion = 10.2;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -253,6 +319,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = AA3BADFA201E92000082CE06;
 			productRefGroup = AA3BAE05201E92000082CE06 /* Products */;
@@ -271,6 +338,7 @@
 			targets = (
 				AA3BAE03201E92000082CE06 /* PythonKit */,
 				AA3BAE32201E95D10082CE06 /* PythonTool */,
+				AA9F0848222F041D00245ED0 /* PythonKitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -297,10 +365,24 @@
 			remoteRef = AA6376A3201E9EBA00D3EE43 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		AA9F0855222F041D00245ED0 /* CommandLineKitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = CommandLineKitTests.xctest;
+			remoteRef = AA9F0854222F041D00245ED0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		AA3BAE02201E92000082CE06 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA9F0847222F041D00245ED0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -330,6 +412,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA9F0845222F041D00245ED0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA9F085A222F056900245ED0 /* PythonRuntimeTests.swift in Sources */,
+				AA9F085B222F056900245ED0 /* NumpyConversionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -337,6 +428,11 @@
 			isa = PBXTargetDependency;
 			target = AA3BAE03201E92000082CE06 /* PythonKit */;
 			targetProxy = AA3BAE43201E997A0082CE06 /* PBXContainerItemProxy */;
+		};
+		AA9F0850222F041D00245ED0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA3BAE03201E92000082CE06 /* PythonKit */;
+			targetProxy = AA9F084F222F041D00245ED0 /* PBXContainerItemProxy */;
 		};
 		AAF3192320BF3261008F1CAA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -491,7 +587,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -516,7 +612,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKit;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -550,6 +646,44 @@
 			};
 			name = Release;
 		};
+		AA9F0851222F041D00245ED0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				INFOPLIST_FILE = Tests/PythonKitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AA9F0852222F041D00245ED0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = T7MC635YG5;
+				INFOPLIST_FILE = Tests/PythonKitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pvieito.PythonKitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -576,6 +710,15 @@
 			buildConfigurations = (
 				AA3BAE37201E95D10082CE06 /* Debug */,
 				AA3BAE38201E95D10082CE06 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA9F0857222F041D00245ED0 /* Build configuration list for PBXNativeTarget "PythonKitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA9F0851222F041D00245ED0 /* Debug */,
+				AA9F0852222F041D00245ED0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

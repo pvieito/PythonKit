@@ -1,19 +1,10 @@
 import XCTest
 import PythonKit
 
-
 class PythonRuntimeTests: XCTestCase {
-
-  override class func setUp() {
-    super.setUp()
-    PythonLibrary.useVersion(3)
-  }
-
   func testCheckVersion() {
-    XCTAssertEqual("3.", String(Python.version)!.prefix(2))
-    let versionInfo = Python.versionInfo
-    XCTAssertEqual(versionInfo.major, 3)
-    XCTAssertGreaterThanOrEqual(versionInfo.minor, 0)
+    XCTAssertGreaterThanOrEqual(Python.versionInfo.major, 2)
+    XCTAssertGreaterThanOrEqual(Python.versionInfo.minor, 0)
   }
 
   func testPythonList() {
@@ -21,7 +12,6 @@ class PythonRuntimeTests: XCTestCase {
     XCTAssertEqual("[0, 1, 2]", list.description)
     XCTAssertEqual(3, Python.len(list))
     XCTAssertEqual("[0, 1, 2]", Python.str(list))
-    XCTAssertEqual("<class 'list'>", Python.str(Python.type(list)))
 
     let polymorphicList = PythonObject(["a", 2, true, 1.5])
     XCTAssertEqual("a", polymorphicList[0])
@@ -265,10 +255,10 @@ class PythonRuntimeTests: XCTestCase {
     XCTAssertEqual(five, Double(5).pythonObject)
   }
 
-// TODO: https://bugs.swift.org/browse/SR-9230
-//  func testSR9230() {
-//    XCTAssertEqual(2, Python.len(Python.dict(a: "a", b: "b")))
-//  }
+  // TODO: https://bugs.swift.org/browse/SR-9230
+  //  func testSR9230() {
+  //    XCTAssertEqual(2, Python.len(Python.dict(a: "a", b: "b")))
+  //  }
 
   // TF-78: isType() consumed refcount for type objects like `PyBool_Type`.
   func testPythonRefCount() {
@@ -279,5 +269,4 @@ class PythonRuntimeTests: XCTestCase {
       _ = Bool.init(b)
     }
   }
-
 }

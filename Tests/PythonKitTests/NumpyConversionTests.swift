@@ -1,17 +1,8 @@
 import XCTest
 import PythonKit
 
-
 class NumpyConversionTests: XCTestCase {
-
-  static var numpyModule: PythonObject?
-
-  override class func setUp() {
-    super.setUp()
-    PythonLibrary.useVersion(3)
-
-    numpyModule = try? Python.attemptImport("numpy")
-  }
+  static var numpyModule = try? Python.attemptImport("numpy")
 
   func testArrayConversion() {
     guard let np = NumpyConversionTests.numpyModule else { return }

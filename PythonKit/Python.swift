@@ -124,15 +124,6 @@ extension PythonObject : CustomStringConvertible {
   }
 }
 
-#if !swift(>=5)
-// Make `PythonObject` show up nicely in the Xcode Playground results sidebar.
-extension PythonObject : CustomPlaygroundQuickLookable {
-  public var customPlaygroundQuickLook: PlaygroundQuickLook {
-    return .text(description)
-  }
-}
-#endif
-
 // Mirror representation, used by debugger/REPL.
 extension PythonObject : CustomReflectable {
   public var customMirror: Mirror {
@@ -1173,7 +1164,7 @@ extension PythonObject : Strideable {
   }
 }
 
-extension PythonObject : Equatable, Comparable, Hashable {
+extension PythonObject : Equatable, Comparable {
   // `Equatable` and `Comparable` are implemented using rich comparison.
   // This is consistent with how Python handles comparisons.
   private func compared(to other: PythonObject, byOp: Int32) -> Bool {
@@ -1218,12 +1209,14 @@ extension PythonObject : Equatable, Comparable, Hashable {
   public static func >= (lhs: PythonObject, rhs: PythonObject) -> Bool {
     return lhs.compared(to: rhs, byOp: Py_GE)
   }
+}
 
-  public var hashValue: Int {
+extension PythonObject : Hashable {
+  public func hash(into hasher: inout Hasher) {
     guard let hash = Int(self.__hash__()) else {
       fatalError("Cannot use '__hash__' on \(self)")
     }
-    return hash
+    hasher.combine(hash)
   }
 }
 
