@@ -1,4 +1,3 @@
-
 import XCTest
 import PythonKit
 
@@ -7,14 +6,14 @@ class PythonRuntimeTests: XCTestCase {
 
   override class func setUp() {
     super.setUp()
-    PythonLibrary.useVersion(3, 7)
+    PythonLibrary.useVersion(3)
   }
 
   func testCheckVersion() {
-    XCTAssertEqual("3.7.", String(Python.version)!.prefix(4))
+    XCTAssertEqual("3.", String(Python.version)!.prefix(2))
     let versionInfo = Python.versionInfo
-    XCTAssertEqual(3, versionInfo.major)
-    XCTAssertEqual(7, versionInfo.minor)
+    XCTAssertEqual(versionInfo.major, 3)
+    XCTAssertGreaterThanOrEqual(versionInfo.minor, 0)
   }
 
   func testPythonList() {

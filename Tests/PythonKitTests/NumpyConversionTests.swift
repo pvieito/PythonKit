@@ -1,4 +1,3 @@
-
 import XCTest
 import PythonKit
 
@@ -9,7 +8,7 @@ class NumpyConversionTests: XCTestCase {
 
   override class func setUp() {
     super.setUp()
-    PythonLibrary.useVersion(3, 7)
+    PythonLibrary.useVersion(3)
 
     numpyModule = try? Python.attemptImport("numpy")
   }
