@@ -3,7 +3,7 @@ import PythonKit
 
 class PythonRuntimeTests: XCTestCase {
   func testCheckVersion() {
-    XCTAssertGreaterThanOrEqual(Python.versionInfo.major, 2)
+    XCTAssertGreaterThanOrEqual(Python.versionInfo.major, 3)
     XCTAssertGreaterThanOrEqual(Python.versionInfo.minor, 0)
   }
 
