@@ -3,7 +3,7 @@ language: generic
 sudo: required
 dist: xenial
 env:
-  - SWIFT_VERSION=5.0-DEVELOPMENT-SNAPSHOT-2019-02-28-a
+  - SWIFT_VERSION=5.0
 install:
   - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
 script:

@@ -4,7 +4,7 @@ Swift framework to interact with Python.
 
 ## Requirements
 
-`PythonKit` requires [**Swift 5**](https://swift.org/download/) or higher and has been tested both on macOS and Linux.
+`PythonKit` requires [**Swift 5**](https://swift.org/download/) or higher and has been tested both on macOS, Linux and Windows.
 
 ## Usage
 
@@ -68,4 +68,4 @@ $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 
 ## Notes
 
-- `Python.swift` is code from the [Swift for TensorFlow project](https://github.com/tensorflow/swift).
+`PythonKit`  is based on the `Python` module from the [Swift for TensorFlow](https://github.com/tensorflow/swift) project. Currently both modules are equivalent, the mantainers have been developing them jointly and are kept in sync.
