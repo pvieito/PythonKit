@@ -86,5 +86,5 @@ do {
     }
 }
 catch {
-    Logger.log(error: error)
+    Logger.log(fatalError: error)
 }
