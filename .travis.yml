@@ -5,7 +5,7 @@ dist: xenial
 install:
   - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
   - wget https://ci.swift.org/job/swift-PR-toolchain-Linux/247//artifact/branch-master/swift-PR-25685-247-ubuntu16.04.tar.gz -O /tmp/swift-PR-25685-247-ubuntu16.04.tar.gz
-  - mkdir $SWIFTENV_ROOT/versions/swift-PR-25685-247/
+  - mkdir -p $SWIFTENV_ROOT/versions/swift-PR-25685-247
   - tar xzf /tmp/swift-PR-25685-247-ubuntu16.04.tar.gz -C $SWIFTENV_ROOT/versions/swift-PR-25685-247/
   - swiftenv global swift-PR-25685-247
 script:
