@@ -3,9 +3,9 @@ language: generic
 sudo: required
 dist: xenial
 env:
-  - SWIFT_VERSION=5.0
+  - SWIFT_VERSION=https://ci.swift.org/job/swift-PR-toolchain-Linux/247//artifact/branch-master/swift-PR-25685-247-ubuntu16.04.tar.gz
 install:
   - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
 script:
-  - PYTHON_VERSION=2 swift test
-  - PYTHON_VERSION=3 swift test
+  - PYTHON_VERSION=2 swift test --enable-test-discovery
+  - PYTHON_VERSION=3 swift test --enable-test-discovery
