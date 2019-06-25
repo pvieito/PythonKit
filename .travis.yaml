@@ -2,6 +2,9 @@ os: linux
 language: generic
 sudo: required
 dist: xenial
+env:
+  - PYTHON_VERSION=2
+  - PYTHON_VERSION=3
 install:
   - SWIFT_VERSION=5.0 eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
   - wget https://ci.swift.org/job/swift-PR-toolchain-Linux/247//artifact/branch-master/swift-PR-25685-247-ubuntu16.04.tar.gz -O /tmp/swift-PR-25685-247-ubuntu16.04.tar.gz
@@ -9,5 +12,4 @@ install:
   - tar xzf /tmp/swift-PR-25685-247-ubuntu16.04.tar.gz -C $SWIFTENV_ROOT/versions/swift-PR-25685-247/
   - swiftenv global swift-PR-25685-247
 script:
-  - PYTHON_VERSION=2 swift test --enable-test-discovery
-  - PYTHON_VERSION=3 swift test --enable-test-discovery
+  - swift test --enable-test-discovery
