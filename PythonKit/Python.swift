@@ -86,7 +86,6 @@ final class PyReference {
 /// a Python C API `PyObject`.
 @dynamicCallable
 @dynamicMemberLookup
-@frozen
 public struct PythonObject {
   /// The underlying `PyReference`.
   fileprivate var reference: PyReference
@@ -207,7 +206,6 @@ public extension PythonObject {
 }
 
 /// An error produced by a failable Python operation.
-@frozen
 public enum PythonError : Error, Equatable {
   /// A Python runtime exception, produced by calling a Python function.
   case exception(PythonObject, traceback: PythonObject?)
@@ -270,7 +268,6 @@ private func throwPythonErrorIfPresent() throws {
 ///   `@dynamicCallable` attribute because the call syntax is unintuitive:
 ///   `x.throwing(arg1, arg2, ...)`. The methods will still be named
 ///   `dynamicallyCall` until further discussion/design.
-@frozen
 public struct ThrowingPythonObject {
   private var base: PythonObject
 
@@ -417,7 +414,6 @@ public extension PythonObject {
 /// Member access operations return an `Optional` result. When member access
 /// fails, `nil` is returned.
 @dynamicMemberLookup
-@frozen
 public struct CheckingPythonObject {
   /// The underlying `PythonObject`.
   private var base: PythonObject
@@ -646,7 +642,6 @@ public let Python = PythonInterface()
 /// - Note: It is not intended for `PythonInterface` to be initialized
 ///   directly. Instead, please use the global instance of `PythonInterface`
 ///   called `Python`.
-@frozen
 @dynamicMemberLookup
 public struct PythonInterface {
   /// A dictionary of the Python builtins.
