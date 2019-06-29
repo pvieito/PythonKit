@@ -3,8 +3,8 @@ language: generic
 sudo: required
 dist: xenial
 env:
-  - PYTHON_VERSION=2 SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a
-  - PYTHON_VERSION=3 SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a
+  - PYTHON_VERSION=2 SWIFT_VERSION=https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a/swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a-ubuntu16.04.tar.gz
+  - PYTHON_VERSION=3 SWIFT_VERSION=https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a/swift-DEVELOPMENT-SNAPSHOT-2019-06-28-a-ubuntu16.04.tar.gz
 install:
   - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
 script:
