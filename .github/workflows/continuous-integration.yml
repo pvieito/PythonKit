@@ -12,9 +12,12 @@ jobs:
         env:
           SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
         run: eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
+      - name: Test Build
+        run: ls -al ~/.swiftenv/shims/
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
+          SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
         run: ~/.swiftenv/shims/swift test --enable-test-discovery
       - name: Test (Python 3)
         env:
