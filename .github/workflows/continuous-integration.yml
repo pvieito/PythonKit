@@ -15,8 +15,8 @@ jobs:
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
-        run: ~/.swiftenv/bin/swift test --enable-test-discovery
+        run: ~/.swiftenv/shims/swift test --enable-test-discovery
       - name: Test (Python 3)
         env:
           PYTHON_VERSION: 3
-        run: ~/.swiftenv/bin/swift test --enable-test-discovery
+        run: ~/.swiftenv/shims/swift test --enable-test-discovery
