@@ -5,15 +5,17 @@ on:
   - pull_request
 
 jobs:
-  build-test:
+  continuous-integration:
     runs-on: ubuntu-latest
     steps:
-      - name: Build
+      - name: Installing Swift
         env:
           SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
         run: eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-      - name: Test Build
+      - name: Environment
         run: pwd
+      - name: Environment 2
+        run: ls -al
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
