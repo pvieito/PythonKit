@@ -8,6 +8,7 @@ jobs:
   continuous-integration:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: Installing Swift
         env:
           SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
