@@ -12,15 +12,12 @@ jobs:
       - name: Installing Swift
         env:
           SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
-        run: eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-      - name: Environment
-        run: pwd
-      - name: Environment 2
-        run: ls -al
+        run: |
+          eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
+          ~/.swiftenv/bin/swiftenv global $SWIFT_VERSION
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
-          SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
         run: ~/.swiftenv/shims/swift test --enable-test-discovery
       - name: Test (Python 3)
         env:
