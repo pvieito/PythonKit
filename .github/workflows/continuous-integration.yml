@@ -6,7 +6,12 @@ on:
 
 jobs:
   continuous-integration:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
       - name: Installing Swift
