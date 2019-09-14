@@ -6,20 +6,31 @@ on:
 
 jobs:
   continuous-integration:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
-      - name: Installing Swift
+      - name: Installing Swift (Linux)
+        if: matrix.os == 'ubuntu-latest'
         env:
-          SWIFT_VERSION: DEVELOPMENT-SNAPSHOT-2019-07-01-a
+          SWIFT_VERSION: 5.1-DEVELOPMENT-SNAPSHOT-2019-09-13-a
         run: |
           eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
           ~/.swiftenv/bin/swiftenv global $SWIFT_VERSION
+          sudo ln -s ~/.swiftenv/shims/swift /usr/bin/swift
+      - name: Installing Swift (macOS)
+        if: matrix.os == 'macOS-latest'
+        run: |
+          sudo xcode-select -s /Applications/Xcode_11.app/Contents/Developer
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
-        run: ~/.swiftenv/shims/swift test --enable-test-discovery
+        run: swift test --enable-test-discovery
       - name: Test (Python 3)
         env:
           PYTHON_VERSION: 3
-        run: ~/.swiftenv/shims/swift test --enable-test-discovery
+        run: swift test --enable-test-discovery
