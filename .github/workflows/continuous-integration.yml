@@ -21,7 +21,7 @@ jobs:
         run: |
           eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
           ~/.swiftenv/bin/swiftenv global $SWIFT_VERSION
-          ln -s /usr/local/bin/swift ~/.swiftenv/shims/swiftenv
+          sudo ln -s /usr/bin/swift ~/.swiftenv/shims/swiftenv
       - name: Installing Swift (macOS)
         if: matrix.os == 'macOS-latest'
         run: |
