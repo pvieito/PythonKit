@@ -17,7 +17,7 @@ jobs:
       - name: Installing Swift (Linux)
         if: matrix.os == 'ubuntu-latest'
         env:
-          SWIFT_VERSION: 5.1-DEVELOPMENT-SNAPSHOT-2019-09-13-a
+          SWIFT_VERSION: 5.1
         run: |
           eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
           ~/.swiftenv/bin/swiftenv global $SWIFT_VERSION
