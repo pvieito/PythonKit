@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v1
       - name: Installing Swift (Linux)
         if: matrix.os == 'ubuntu-latest'
+        env:
+          SWIFT_VERSION: latest
         run: |
           eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
           sudo ln -s ~/.swiftenv/shims/swift /usr/bin/swift
