@@ -16,16 +16,9 @@ jobs:
       - uses: actions/checkout@v1
       - name: Installing Swift (Linux)
         if: matrix.os == 'ubuntu-latest'
-        env:
-          SWIFT_VERSION: 5.1
         run: |
           eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-          ~/.swiftenv/bin/swiftenv global $SWIFT_VERSION
           sudo ln -s ~/.swiftenv/shims/swift /usr/bin/swift
-      - name: Installing Swift (macOS)
-        if: matrix.os == 'macOS-latest'
-        run: |
-          sudo xcode-select -s /Applications/Xcode_11.app/Contents/Developer
       - name: Test (Python 2)
         env:
           PYTHON_VERSION: 2
