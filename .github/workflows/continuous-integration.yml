@@ -14,7 +14,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
-      - uses: YOCKOW/Action-setup-swift@master
+      - name: Install Swift
+        uses: YOCKOW/Action-setup-swift@master
         with:
           swift-version: '5.1'
       - name: Test (Python 2)
