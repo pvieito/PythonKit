@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "PythonTool",
+    name: "PythoKit",
     products: [
         .executable(
             name: "PythonTool",
