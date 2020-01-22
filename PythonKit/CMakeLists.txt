@@ -12,7 +12,7 @@ install(TARGETS PythonKit
   LIBRARY DESTINATION lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>
   RUNTIME DESTINATION bin)
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftdoc
-  ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftmodule
+  ${CMAKE_CURRENT_BINARY_DIR}/PythonKit.swiftdoc
+  ${CMAKE_CURRENT_BINARY_DIR}/PythonKit.swiftmodule
   DESTINATION lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/$<LOWER_CASE:${CMAKE_SYSTEM_NAME}>/${swift_arch})
 set_property(GLOBAL APPEND PROPERTY PythonKit_EXPORTS PythonKit)
