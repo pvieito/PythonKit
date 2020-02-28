@@ -13,16 +13,16 @@ install(TARGETS PythonKit
   LIBRARY DESTINATION lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/${swift_os}
   RUNTIME DESTINATION bin)
 if(CMAKE_SYSTEM_NAME STREQUAL Darwin)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftdoc
+  install(FILES $<TARGET_PROPERTY:PythonKit,Swift_MODULE_DIRECTORY>/PythonKit.swiftdoc
     DESTINATION  lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/${swift_os}/PythonKit.swiftmodule
     RENAME ${swift_arch}.swiftdoc)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftmodule
+  install(FILES $<TARGET_PROPERTY:PythonKit,Swift_MODULE_DIRECTORY>/PythonKit.swiftmodule
     DESTINATION lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/${swift_os}/PythonKit.swiftmodule
     RENAME ${swift_arch}.swiftmodule)
 else()
   install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftdoc
-    ${CMAKE_CURRENT_BINARY_DIR}/swift/PythonKit.swiftmodule
+    $<TARGET_PROPERTY:PythonKit,Swift_MODULE_DIRECTORY>/PythonKit.swiftdoc
+    $<TARGET_PROPERTY:PythonKit,Swift_MODULE_DIRECTORY>/PythonKit.swiftmodule
     DESTINATION lib/swift$<$<NOT:$<BOOL:${BUILD_SHARED_LIBS}>>:_static>/${swift_os}/${swift_arch})
 endif()
 set_property(GLOBAL APPEND PROPERTY PythonKit_EXPORTS PythonKit)
