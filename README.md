@@ -38,7 +38,7 @@ Add the following dependency to your `Package.swift` manifest:
 .package(url: "https://github.com/pvieito/PythonKit.git", .branch("master")),
 ```
 
-## Build
+## Build & Run
 
 `PythonKit` can be built with Swift PM:
 
