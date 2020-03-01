@@ -46,7 +46,6 @@ struct PythonTool: ParsableCommand {
             Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
             
             if self.path {
-                
                 Logger.log(important: "Python Paths (\(sys.path.count))")
                 
                 if !sys.path.isEmpty {
@@ -60,9 +59,7 @@ struct PythonTool: ParsableCommand {
             }
             
             if self.list {
-                
                 let pkg_resources = try Python.attemptImport("pkg_resources")
-                
                 let installedModules = Dictionary<String, PythonObject>(pkg_resources.working_set.by_key)!
                 
                 Logger.log(important: "Python Modules (\(installedModules.count))")
