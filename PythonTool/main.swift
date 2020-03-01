@@ -8,83 +8,81 @@
 
 import Foundation
 import LoggerKit
-import CommandLineKit
+import ArgumentParser
 import PythonKit
 
-let listOption = BoolOption(shortFlag: "l", longFlag: "list", helpMessage: "List installed modules.")
-let pathOption = BoolOption(shortFlag: "p", longFlag: "path", helpMessage: "List Python paths.")
-let verboseOption = BoolOption(shortFlag: "v", longFlag: "verbose", helpMessage: "Verbose mode.")
-let helpOption = BoolOption(shortFlag: "h", longFlag: "help", helpMessage: "Prints a help message.")
-
-let cli = CommandLineKit.CommandLine()
-cli.addOptions(listOption, pathOption, verboseOption, helpOption)
-
-do {
-    try cli.parse(strict: true)
-}
-catch {
-    cli.printUsage(error)
-    exit(EX_USAGE)
-}
-
-if helpOption.value {
-    cli.printUsage()
-    exit(-1)
-}
-
-Logger.logMode = .commandLine
-Logger.logLevel = verboseOption.value ? .debug : .info
-
-do {
-    let pythonVersion = OperatingSystemVersion(
-        majorVersion: Int(Python.versionInfo.major) ?? 0,
-        minorVersion: Int(Python.versionInfo.minor) ?? 0,
-        patchVersion: Int(Python.versionInfo.micro) ?? 0
-    )
-    
-    Logger.log(important: "Python \(pythonVersion.shortVersion)")
-    Logger.log(info: "Version: \(pythonVersion)")
-    Logger.log(verbose: "Version String: \(Python.version.splitlines()[0])")
-
-    let sys = try Python.attemptImport("sys")
-    
-    Logger.log(verbose: "Executable: \(sys.executable)")
-    Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
-    
-    if pathOption.value {
-        
-        Logger.log(important: "Python Paths (\(sys.path.count))")
-        
-        if !sys.path.isEmpty {
-            for searchPath in sys.path {
-                Logger.log(success: searchPath)
-            }
-        }
-        else {
-            Logger.log(warning: "No paths available.")
-        }
+struct PythonTool: ParsableCommand {
+    static var configuration: CommandConfiguration {
+        return CommandConfiguration(commandName: String(describing: Self.self))
     }
     
-    if listOption.value {
-        
-        let pkg_resources = try Python.attemptImport("pkg_resources")
-        
-        let installedModules = Dictionary<String, PythonObject>(pkg_resources.working_set.by_key)!
-        
-        Logger.log(important: "Python Modules (\(installedModules.count))")
-        
-        if !installedModules.isEmpty {
-            let installedModulesArray = installedModules.sorted { $0.key.lowercased() < $1.key.lowercased() }
+    @Flag(name: .shortAndLong, help: "List installed modules.")
+    var list: Bool
+
+    @Flag(name: .shortAndLong, help: "List Python paths.")
+    var path: Bool
+
+    @Flag(name: .shortAndLong, help: "Verbose mode.")
+    var verbose: Bool
+
+    func run() throws {
+        do {
+            Logger.logMode = .commandLine
+            Logger.logLevel = self.verbose ? .debug : .info
+
+            let pythonVersion = OperatingSystemVersion(
+                majorVersion: Int(Python.versionInfo.major) ?? 0,
+                minorVersion: Int(Python.versionInfo.minor) ?? 0,
+                patchVersion: Int(Python.versionInfo.micro) ?? 0
+            )
             
-            for (_, moduleReference) in installedModulesArray {
-                Logger.log(success: "\(moduleReference.key) (\(moduleReference.version))")
+            Logger.log(important: "Python \(pythonVersion.shortVersion)")
+            Logger.log(info: "Version: \(pythonVersion)")
+            Logger.log(verbose: "Version String: \(Python.version.splitlines()[0])")
+
+            let sys = try Python.attemptImport("sys")
+            
+            Logger.log(verbose: "Executable: \(sys.executable)")
+            Logger.log(verbose: "Executable Prefix: \(sys.exec_prefix)")
+            
+            if self.path {
+                
+                Logger.log(important: "Python Paths (\(sys.path.count))")
+                
+                if !sys.path.isEmpty {
+                    for searchPath in sys.path {
+                        Logger.log(success: searchPath)
+                    }
+                }
+                else {
+                    Logger.log(warning: "No paths available.")
+                }
+            }
+            
+            if self.list {
+                
+                let pkg_resources = try Python.attemptImport("pkg_resources")
+                
+                let installedModules = Dictionary<String, PythonObject>(pkg_resources.working_set.by_key)!
+                
+                Logger.log(important: "Python Modules (\(installedModules.count))")
+                
+                if !installedModules.isEmpty {
+                    let installedModulesArray = installedModules.sorted { $0.key.lowercased() < $1.key.lowercased() }
+                    
+                    for (_, moduleReference) in installedModulesArray {
+                        Logger.log(success: "\(moduleReference.key) (\(moduleReference.version))")
+                    }
+                }
+                else {
+                    Logger.log(warning: "No modules available.")
+                }
             }
         }
-        else {
-            Logger.log(warning: "No modules available.")
+        catch {
+            Logger.log(fatalError: error)
         }
     }
 }
-catch {
-    Logger.log(fatalError: error)
-}
+
+PythonTool.main()

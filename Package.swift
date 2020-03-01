@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.1
 
 import PackageDescription
 
@@ -15,13 +15,13 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/pvieito/CommandLineKit.git", .branch("master")),
-        .package(url: "https://github.com/pvieito/LoggerKit.git", .branch("master"))
+        .package(url: "https://github.com/pvieito/LoggerKit.git", .branch("master")),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
     ],
     targets: [
         .target(
             name: "PythonTool",
-            dependencies: ["LoggerKit", "CommandLineKit", "PythonKit"],
+            dependencies: ["LoggerKit", "PythonKit", .product(name: "ArgumentParser", package: "swift-argument-parser")],
             path: "PythonTool"
         ),
         .target(
