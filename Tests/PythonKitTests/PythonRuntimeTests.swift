@@ -257,7 +257,8 @@ class PythonRuntimeTests: XCTestCase {
     
     // SR-9230: https://bugs.swift.org/browse/SR-9230
     func testSR9230() {
-      XCTAssertEqual(Python.len(Python.dict(a: "a", b: "b")), 2)
+      let pythonDict = Python.dict(a: "a", b: "b")
+      XCTAssertEqual(Python.len(pythonDict), 2)
     }
     
     // TF-78: isType() consumed refcount for type objects like `PyBool_Type`.
