@@ -69,3 +69,7 @@ $ PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython2.7.so swift run
 ## Notes
 
 `PythonKit`  is based on the `Python` module from the [Swift for TensorFlow](https://github.com/tensorflow/swift) project. Currently both modules are equivalent, the mantainers have been developing them jointly and are kept in sync.
+
+# Support
+
+If you have questions about `PythonKit` you can ask on the [Swift for TensorFlow Google Group](https://groups.google.com/a/tensorflow.org/forum/#!forum/swift) or on the [Swift Forums](https://forums.swift.org).
