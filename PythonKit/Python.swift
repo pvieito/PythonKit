@@ -419,6 +419,8 @@ public struct CheckingPythonObject {
         self.base = base
     }
     
+    var ownedPyObject: OwnedPyObjectPointer { get { base.ownedPyObject }}
+    
     public subscript(dynamicMember name: String) -> PythonObject? {
         get {
             let selfObject = base.ownedPyObject
