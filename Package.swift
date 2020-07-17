@@ -10,6 +10,9 @@ let package = Package(
             targets: ["PythonTool"]
         ),
         .library(
+            name: "PythonLambdaSupport", // provides C-based interface to Python
+            targets: ["PythonLambdaSupport"]),
+        .library(
             name: "PythonKit",
             targets: ["PythonKit"]
         )
@@ -25,7 +28,16 @@ let package = Package(
             path: "PythonTool"
         ),
         .target(
+            name: "libpylamsupport",
+            dependencies: []
+        ),
+        .target(
+            name: "PythonLambdaSupport",
+            dependencies: ["libpylamsupport"]
+        ),
+        .target(
             name: "PythonKit",
+            dependencies:[  "PythonLambdaSupport" ],
             path: "PythonKit"
         ),
         .testTarget(
