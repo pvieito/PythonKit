@@ -9,7 +9,7 @@ import PythonLambdaSupport
 
 let METH_VARARGS  = Int32(0x0001)
 
-/// Allows Swift functions to be represented as Python lambdas. Note that you can use the typealias 𝝺 for `PythonLambda`, as per this documentation, because it looks nice.
+/// Allows Swift functions to be represented as Python lambdas. Note that you can use the typealias 𝝺 for `PythonLambda`, as per this documentation, because it looks nice. PythonLambda is only available on Python versions > 3.
 ///
 /// Example:
 ///
@@ -77,7 +77,7 @@ let METH_VARARGS  = Int32(0x0001)
 ///
 public typealias 𝝺 = PythonLambda
 
-/// Allows Swift functions to be represented as Python lambdas. Note that you can use the typealias 𝝺 for `PythonLambda`, as per this documentation, because it looks nice.
+/// Allows Swift functions to be represented as Python lambdas. Note that you can use the typealias 𝝺 for `PythonLambda`, as per this documentation, because it looks nice. PythonLambda is only available on Python versions > 3.
 ///
 /// Example:
 ///
