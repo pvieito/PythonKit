@@ -23,6 +23,8 @@ import MSVCRT
 import WinSDK
 #endif
 
+import PythonLambdaSupport
+
 //===----------------------------------------------------------------------===//
 // The `PythonLibrary` struct that loads Python symbols at runtime.
 //===----------------------------------------------------------------------===//
@@ -53,6 +55,8 @@ public struct PythonLibrary {
                 "Loaded legacy Python library, using legacy symbols...")
         }
         PythonLibrary.librarySymbolsLoaded = true
+        
+        PythonLambdaSupport.initialise(withLibrary: pythonLibraryHandle)
     }
     
     static func loadSymbol(
