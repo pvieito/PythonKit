@@ -270,4 +270,16 @@ class PythonRuntimeTests: XCTestCase {
             _ = Bool.init(b)
         }
     }
+    
+    func testGetObjectPointers() {
+        let pythonObject = PythonObject([1,"a",true])
+        let ptr = pythonObject.asUnsafePointer
+        let pyObjectFromRef = PythonObject(unsafe: ptr)
+        
+        XCTAssertEqual(pythonObject, pyObjectFromRef)
+    }
+    
+    func testLibraryHandle() {
+        XCTAssertNotNil(PythonLibrary.sharedPythonLibrary)
+    }
 }
