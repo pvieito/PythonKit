@@ -114,6 +114,13 @@ public struct PythonObject {
     }
 }
 
+extension PythonObject {
+    // For connecting with the Python C interface
+    public init(unsafe pointer: UnsafeMutableRawPointer) {
+        reference = PyReference(pointer)
+    }
+}
+
 // Make `print(python)` print a pretty form of the `PythonObject`.
 extension PythonObject : CustomStringConvertible {
     /// A textual description of this `PythonObject`, produced by `Python.str`.
@@ -405,6 +412,11 @@ public extension PythonObject {
     var checking: CheckingPythonObject {
         return CheckingPythonObject(self)
     }
+    
+    // For interfacing with the C-Python interface
+    var asUnsafePointer : UnsafeMutableRawPointer {
+        return CheckingPythonObject(self).ownedPyObject
+    }
 }
 
 /// A `PythonObject` wrapper that enables member accesses.
@@ -418,6 +430,8 @@ public struct CheckingPythonObject {
     fileprivate init(_ base: PythonObject) {
         self.base = base
     }
+    
+    internal var ownedPyObject: OwnedPyObjectPointer { get { base.ownedPyObject }}
     
     public subscript(dynamicMember name: String) -> PythonObject? {
         get {
@@ -1338,5 +1352,28 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
     public typealias Value = PythonObject
     public init(dictionaryLiteral elements: (PythonObject, PythonObject)...) {
         self.init(Dictionary(elements, uniquingKeysWith: { lhs, _ in lhs }))
+    }
+}
+
+
+extension PythonInterface {
+    /// Executes Python code directly in the Python interpreter. Useful to (for example) define a function to
+    /// call as a lambda later.
+    ///
+    /// Use at your own risk! Errors must be handled in Python, otherwise they are likely to simply crash your Swift code.
+    ///
+    /// - Example:
+    ///
+    ///       Python.execute("""
+    ///           def add5(i):
+    ///               return (i+5)
+    ///       """)
+    ///       let fiveAdder = PythonStringLambda(lambda: "i:add5(i)")
+    ///       Python.map( fiveAdder , [10,12,14] )   // [15,17,19]
+    public func execute(_ code: String) {
+        PyRun_SimpleString(
+        """
+        \(code)
+        """)
     }
 }

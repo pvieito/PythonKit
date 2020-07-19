@@ -82,6 +82,11 @@ public struct PythonLibrary {
     }
 }
 
+public extension PythonLibrary {
+    /// For integration with the C Python interface
+    static var sharedPythonLibrary: UnsafeMutableRawPointer { get { PythonLibrary.shared.pythonLibraryHandle }}
+}
+
 // Methods of `PythonLibrary` required to set a given Python version.
 public extension PythonLibrary {
     static func useVersion(_ major: Int, _ minor: Int? = nil) {
