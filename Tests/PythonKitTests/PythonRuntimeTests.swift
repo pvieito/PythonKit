@@ -282,4 +282,17 @@ class PythonRuntimeTests: XCTestCase {
     func testLibraryHandle() {
         XCTAssertNotNil(PythonLibrary.sharedPythonLibrary)
     }
+
+    func testExecute() {
+        let main = Python.import("__main__")
+        Python.execute("""
+        def add5(i):
+            return (i+5)
+        """)
+
+        let added5 = main[dynamicMember:"add5"](2)
+        
+        XCTAssertEqual(added5, 7)
+    }
+
 }
