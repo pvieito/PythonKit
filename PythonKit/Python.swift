@@ -1139,11 +1139,21 @@ where Bound : ConvertibleFromPython {
 
 private typealias PythonBinaryOp =
     (OwnedPyObjectPointer?, OwnedPyObjectPointer?) -> OwnedPyObjectPointer?
+private typealias PythonUnaryOp =
+    (OwnedPyObjectPointer?) -> OwnedPyObjectPointer?    
 
 private func performBinaryOp(
     _ op: PythonBinaryOp, lhs: PythonObject, rhs: PythonObject) -> PythonObject {
     let result = op(lhs.borrowedPyObject, rhs.borrowedPyObject)
     // If binary operation fails (e.g. due to `TypeError`), throw an exception.
+    try! throwPythonErrorIfPresent()
+    return PythonObject(consuming: result!)
+}
+
+private func performUnaryOp(
+    _ op: PythonUnaryOp, operand: PythonObject) -> PythonObject {
+    let result = op(operand.borrowedPyObject)
+    // If unary operation fails (e.g. due to `TypeError`), throw an exception.
     try! throwPythonErrorIfPresent()
     return PythonObject(consuming: result!)
 }
@@ -1156,7 +1166,7 @@ public extension PythonObject {
     static func - (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
         return performBinaryOp(PyNumber_Subtract, lhs: lhs, rhs: rhs)
     }
-    
+
     static func * (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
         return performBinaryOp(PyNumber_Multiply, lhs: lhs, rhs: rhs)
     }
@@ -1191,6 +1201,12 @@ extension PythonObject : SignedNumeric {
     
     public var magnitude: PythonObject {
         return self < 0 ? -self : self
+    }
+
+    //override the default implementation of - prefix function
+    //from Signed Numeric  (https://bugs.swift.org/browse/SR-13293)
+    public static prefix func - (_ operand: Self) -> Self {
+        return performUnaryOp(PyNumber_Negative, operand: operand)
     }
 }
 
