@@ -1204,7 +1204,7 @@ extension PythonObject : SignedNumeric {
     }
 
     //override the default implementation of - prefix function
-    //from Signed Numeric  (https://bugs.swift.org/browse/SR-13293)
+    //from SignedNumeric  (https://bugs.swift.org/browse/SR-13293)
     public static prefix func - (_ operand: Self) -> Self {
         return performUnaryOp(PyNumber_Negative, operand: operand)
     }
