@@ -22,6 +22,8 @@ typealias PyObjectPointer = UnsafeMutableRawPointer
 typealias PyCCharPointer = UnsafePointer<Int8>
 typealias PyBinaryOperation =
     @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+typealias PyUnaryOperation =
+    @convention(c) (PyObjectPointer?) -> PyObjectPointer?    
 
 let Py_LT: Int32 = 0
 let Py_LE: Int32 = 1
@@ -213,3 +215,6 @@ let PyNumber_InPlaceMultiply: PyBinaryOperation =
 
 let PyNumber_InPlaceTrueDivide: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceTrueDivide")
+
+let PyNumber_Negative: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Negative")
