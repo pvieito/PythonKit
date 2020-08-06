@@ -113,12 +113,12 @@ class PythonRuntimeTests: XCTestCase {
     }
 
     func testUnaryOps() {
-        var x = PythonObject(5)
+	var x = PythonObject(5)
 	x = -x
-        XCTAssertEqual(-5, x)
+	XCTAssertEqual(-5, x)
 	x = PythonObject(-5)
 	x = -x
-        XCTAssertEqual(5, x)
+	XCTAssertEqual(5, x)
     }
 
     func testComparable() {
