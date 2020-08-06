@@ -111,7 +111,16 @@ class PythonRuntimeTests: XCTestCase {
         x += -1
         XCTAssertEqual(2.5, x)
     }
-    
+
+    func testUnaryOps() {
+        var x = PythonObject(5)
+	x = -x
+        XCTAssertEqual(-5, x)
+	x = PythonObject(-5)
+	x = -x
+        XCTAssertEqual(5, x)
+    }
+
     func testComparable() {
         let array: [PythonObject] = [-1, 10, 1, 0, 0]
         XCTAssertEqual([-1, 0, 0, 1, 10], array.sorted())
