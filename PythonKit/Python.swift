@@ -1363,7 +1363,14 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
 // PythonFunction - create functions in Swift that can be called from Python
 //===----------------------------------------------------------------------===//
 
-import Python
+typealias PyCFunction = @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+
+struct PyMethodDef {
+    public var ml_name: UnsafePointer<Int8> /* The name of the built-in function/method */
+    public var ml_meth: PyCFunction /* The C function that implements it */
+    public var ml_flags: Int32 /* Combination of METH_xxx flags, which mostly describe the args expected by the C func */
+    public var ml_doc: UnsafePointer<Int8>? /* The __doc__ attribute, or NULL */
+}
 
 /// Create functions in Swift that can be called from Python
 ///
@@ -1445,7 +1452,7 @@ private extension PythonFunction {
                 let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
 
                 // This must only be `nil` if an exception has been set (i.e. an error was thrown)
-                return self.callSwiftFunction(args)?.assumingMemoryBound(to: PyObject.self)
+                return self.callSwiftFunction(args)
         },
             ml_flags: METH_VARARGS,
             ml_doc: nil
