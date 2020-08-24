@@ -1326,6 +1326,7 @@ extension PythonObject : Sequence {
     }
 }
 
+
 //===----------------------------------------------------------------------===//
 // `ExpressibleByLiteral` conformances
 //===----------------------------------------------------------------------===//
@@ -1356,3 +1357,127 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
         self.init(Dictionary(elements, uniquingKeysWith: { lhs, _ in lhs }))
     }
 }
+
+
+//===----------------------------------------------------------------------===//
+// PythonFunction - create functions in Swift that can be called from Python
+//===----------------------------------------------------------------------===//
+
+import Python
+
+/// Create functions in Swift that can be called from Python
+///
+/// Example:
+///
+/// The Python code `map(lambda(x: x * 2), [10, 12, 14])`  would be written as:
+///
+///     Python.map(PythonFunction { x in x * 2 }, [10, 12, 14]) // [20, 24, 28]
+///
+final public class PythonFunction {
+    /// Called directly by the Python C API
+    private let callSwiftFunction: (UnsafeMutableRawPointer) -> UnsafeMutableRawPointer?
+
+    static func setException(error: Error) {
+        if let pythonObject = error as? PythonObject {
+            if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
+                // We are an instance of an Exception class type. Set the exception class to the object's type:
+                PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
+            } else {
+                // Assume an actual class type was thrown (rather than an instance):
+                PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
+            }
+        } else {
+            // Make a generic Python Exception based on the Swift Error:
+            PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: error)) raised in Swift: \(error)")
+        }
+    }
+
+    public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
+        self.callSwiftFunction = { pythonObjectPointer in
+            let argumentsAsTuple = PythonObject(pythonObjectPointer)
+            do {
+                return try fn(argumentsAsTuple[0]).ownedPyObject
+            } catch {
+                PythonFunction.setException(error: error)
+                return nil
+            }
+        }
+    }
+
+    /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
+    public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
+        self.callSwiftFunction = { pythonObjectPointer in
+            let argumentsAsTuple = PythonObject(consuming: pythonObjectPointer)
+            let argumentsAsArray = argumentsAsTuple.map { $0 }
+            do {
+                return try fn(argumentsAsArray).ownedPyObject
+            } catch {
+                PythonFunction.setException(error: error)
+                return nil
+            }
+        }
+    }
+}
+
+// The pointers here technically constitute a leak but they
+// are only instantiated on first use and require < 1kb RAM.
+private extension PythonFunction {
+    static let sharedFunctionName: UnsafePointer<Int8> = {
+        let name = "pythonkit_swift_function"
+        let cString = name.utf8CString
+        let copy = UnsafeMutableBufferPointer<Int8>.allocate(capacity: cString.count)
+        _ = copy.initialize(from: cString)
+        return UnsafePointer(copy.baseAddress!)
+    }()
+
+    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        /// The standard calling convention. See Python C API docs
+        let METH_VARARGS = 1 as Int32
+
+        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
+        pointer.pointee = PyMethodDef(
+            ml_name: PythonFunction.sharedFunctionName,
+            ml_meth: { context, args in
+                guard let args = args, let selfPointer = context else {
+                    return nil
+                }
+
+                let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
+
+                // This must only be `nil` if an exception has been set (i.e. an error was thrown)
+                return self.callSwiftFunction(args)?.assumingMemoryBound(to: PyObject.self)
+        },
+            ml_flags: METH_VARARGS,
+            ml_doc: nil
+        )
+
+        return pointer
+    }()
+}
+
+extension PythonFunction : PythonConvertible {
+    public var pythonObject: PythonObject {
+        _ = Python // Ensure Python is initialized.
+
+        // FIXME: Memory management issue:
+        // It is necessary to pass a retained reference to `PythonFunction` so that it
+        // outlives the `PyReference` of the PyCFunction we create below. If we don't,
+        // Python tries to access what then has become a garbage pointer when it cleans
+        // up the CFunction. This means the entire `PythonFunction` currently leaks.
+        let selfPointer = Unmanaged.passRetained(self).toOpaque()
+
+        let fnPointer = PyCFunction_New(
+            PythonFunction.sharedMethodDefinition,
+            selfPointer
+        )
+
+        // FIXME: Another potential memory management issue.
+        // I can't see how to stop these functions from being prematurely
+        // garbage collected unless we untrack it from the Python GC.
+        PyObject_GC_UnTrack(fnPointer)
+
+        return PythonObject(fnPointer)
+    }
+}
+
+extension PythonObject : Error {}
