@@ -1389,61 +1389,6 @@ final public class PythonFunction {
     }
 }
 
-// The pointers here technically constitute a leak but they
-// are only instantiated on first use and require < 1kb RAM.
-private extension PythonFunction {
-    static let sharedFunctionName: UnsafePointer<Int8> = {
-        let name = "pythonkit_swift_function"
-        let cString = name.utf8CString
-        let copy = UnsafeMutableBufferPointer<Int8>.allocate(capacity: cString.count)
-        _ = copy.initialize(from: cString)
-        return UnsafePointer(copy.baseAddress!)
-    }()
-
-    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
-        /// The standard calling convention. See Python C API docs
-        let METH_VARARGS = 1 as Int32
-
-        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
-        pointer.pointee = PyMethodDef(
-            ml_name: PythonFunction.sharedFunctionName,
-            ml_meth: { context, args in
-                guard let args = args, let selfPointer = context else {
-                    return nil
-                }
-
-                let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
-
-                do {
-                    let argumentsAsTuple = PythonObject(consuming: args)
-                    return try self.callSwiftFunction(argumentsAsTuple).ownedPyObject
-                } catch {
-                    if let pythonObject = error as? PythonObject {
-                        if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
-                            // We are an instance of an Exception class type. Set the exception class to the object's type:
-                            PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
-                        } else {
-                            // Assume an actual class type was thrown (rather than an instance)
-                            // This will crash if it was neither a subclass of BaseException nor an instance of one:
-                            PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
-                        }
-                    } else {
-                        // Make a generic Python Exception based on the Swift Error:
-                        PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: error)) raised in Swift: \(error)")
-                    }
-
-                    // This must only be `nil` if an exception has been set (i.e. an error was thrown)
-                    return nil
-                }
-        },
-            ml_flags: METH_VARARGS,
-            ml_doc: nil
-        )
-
-        return pointer
-    }()
-}
-
 extension PythonFunction : PythonConvertible {
     public var pythonObject: PythonObject {
         _ = Python // Ensure Python is initialized.
@@ -1466,6 +1411,69 @@ extension PythonFunction : PythonConvertible {
         PyObject_GC_UnTrack(fnPointer)
 
         return PythonObject(fnPointer)
+    }
+}
+
+// The pointers here technically constitute a leak, but no more than
+// a static string or a static struct definition at top level.
+fileprivate extension PythonFunction {
+    static let sharedFunctionName: UnsafePointer<Int8> = {
+        let name = "pythonkit_swift_function"
+        let cString = name.utf8CString
+        let copy = UnsafeMutableBufferPointer<Int8>.allocate(capacity: cString.count)
+        _ = copy.initialize(from: cString)
+        return UnsafePointer(copy.baseAddress!)
+    }()
+
+    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        /// The standard calling convention. See Python C API docs
+        let METH_VARARGS = 1 as Int32
+
+        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
+        pointer.pointee = PyMethodDef(
+            ml_name: PythonFunction.sharedFunctionName,
+            ml_meth: PythonFunction.sharedMethodImplementation,
+            ml_flags: METH_VARARGS,
+            ml_doc: nil
+        )
+
+        return pointer
+    }()
+
+    private static let sharedMethodImplementation: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? = { context, argumentsPointer in
+        guard let argumentsPointer = argumentsPointer, let selfPointer = context else {
+            return nil
+        }
+
+        let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
+
+        do {
+            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            return try self.callSwiftFunction(argumentsAsTuple).ownedPyObject
+        } catch {
+            PythonFunction.setPythonError(swiftError: error)
+            return nil // This must only be `nil` if an exception has been set
+        }
+    }
+
+    private static func setPythonError(swiftError: Error) {
+        if let pythonObject = swiftError as? PythonObject {
+            if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
+                // We are an instance of an Exception class type. Set the exception class to the object's type:
+                PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
+            } else {
+                // Assume an actual class type was thrown (rather than an instance)
+                // Crashes if it was neither a subclass of BaseException nor an instance of one.
+                //
+                // We *could* check to see whether `pythonObject` is a class here and fall back
+                // to the default case of setting a generic Exception, below, but we also want
+                // people to write valid code.
+                PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
+            }
+        } else {
+            // Make a generic Python Exception based on the Swift Error:
+            PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: swiftError)) raised in Swift: \(swiftError)")
+        }
     }
 }
 
