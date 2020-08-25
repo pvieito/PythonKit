@@ -1363,15 +1363,6 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
 // PythonFunction - create functions in Swift that can be called from Python
 //===----------------------------------------------------------------------===//
 
-typealias PyCFunction = @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
-
-struct PyMethodDef {
-    public var ml_name: UnsafePointer<Int8> /* The name of the built-in function/method */
-    public var ml_meth: PyCFunction /* The C function that implements it */
-    public var ml_flags: Int32 /* Combination of METH_xxx flags, which mostly describe the args expected by the C func */
-    public var ml_doc: UnsafePointer<Int8>? /* The __doc__ attribute, or NULL */
-}
-
 /// Create functions in Swift that can be called from Python
 ///
 /// Example:
@@ -1382,46 +1373,18 @@ struct PyMethodDef {
 ///
 final public class PythonFunction {
     /// Called directly by the Python C API
-    private let callSwiftFunction: (UnsafeMutableRawPointer) -> UnsafeMutableRawPointer?
-
-    static func setException(error: Error) {
-        if let pythonObject = error as? PythonObject {
-            if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
-                // We are an instance of an Exception class type. Set the exception class to the object's type:
-                PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
-            } else {
-                // Assume an actual class type was thrown (rather than an instance):
-                PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
-            }
-        } else {
-            // Make a generic Python Exception based on the Swift Error:
-            PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: error)) raised in Swift: \(error)")
-        }
-    }
+    private let callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
 
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
-        self.callSwiftFunction = { pythonObjectPointer in
-            let argumentsAsTuple = PythonObject(pythonObjectPointer)
-            do {
-                return try fn(argumentsAsTuple[0]).ownedPyObject
-            } catch {
-                PythonFunction.setException(error: error)
-                return nil
-            }
+        self.callSwiftFunction = { argumentsAsTuple in
+            return try fn(argumentsAsTuple[0])
         }
     }
 
     /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
-        self.callSwiftFunction = { pythonObjectPointer in
-            let argumentsAsTuple = PythonObject(consuming: pythonObjectPointer)
-            let argumentsAsArray = argumentsAsTuple.map { $0 }
-            do {
-                return try fn(argumentsAsArray).ownedPyObject
-            } catch {
-                PythonFunction.setException(error: error)
-                return nil
-            }
+        self.callSwiftFunction = { argumentsAsTuple in
+            return try fn(argumentsAsTuple.map { $0 })
         }
     }
 }
@@ -1451,8 +1414,27 @@ private extension PythonFunction {
 
                 let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
 
-                // This must only be `nil` if an exception has been set (i.e. an error was thrown)
-                return self.callSwiftFunction(args)
+                do {
+                    let argumentsAsTuple = PythonObject(consuming: args)
+                    return try self.callSwiftFunction(argumentsAsTuple).ownedPyObject
+                } catch {
+                    if let pythonObject = error as? PythonObject {
+                        if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
+                            // We are an instance of an Exception class type. Set the exception class to the object's type:
+                            PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
+                        } else {
+                            // Assume an actual class type was thrown (rather than an instance)
+                            // This will crash if it was neither a subclass of BaseException nor an instance of one:
+                            PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
+                        }
+                    } else {
+                        // Make a generic Python Exception based on the Swift Error:
+                        PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: error)) raised in Swift: \(error)")
+                    }
+
+                    // This must only be `nil` if an exception has been set (i.e. an error was thrown)
+                    return nil
+                }
         },
             ml_flags: METH_VARARGS,
             ml_doc: nil
@@ -1488,3 +1470,18 @@ extension PythonFunction : PythonConvertible {
 }
 
 extension PythonObject : Error {}
+
+// From Python's C Headers:
+struct PyMethodDef {
+    /// The name of the built-in function/method
+    public var ml_name: UnsafePointer<Int8>
+
+    /// The C function that implements it
+    public var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+
+    /// Combination of METH_xxx flags, which mostly describe the args expected by the C func
+    public var ml_flags: Int32
+
+    /// The __doc__ attribute, or NULL
+    public var ml_doc: UnsafePointer<Int8>?
+}
