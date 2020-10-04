@@ -1,0 +1,41 @@
+name: Continuous Integration
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  continuous-integration:
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: seanmiddleditch/gha-setup-vsdevenv@master
+      - name: Install Swift
+        run: |
+          Install-Binary -Url "https://swift.org/builds/development/windows10/swift-DEVELOPMENT-SNAPSHOT-2020-09-22-a/swift-DEVELOPMENT-SNAPSHOT-2020-09-22-a-windows10.exe" -Name "installer.exe" -ArgumentList ("-q")
+      - name: Set Environment Variables
+        run: |
+          echo "::set-env name=SDKROOT::C:\Library\Developer\Platforms\Windows.platform\Developer\SDKs\Windows.sdk"
+          echo "::set-env name=DEVELOPER_DIR::C:\Library\Developer"
+      - name: Adjust Paths
+        run: |
+          echo "::add-path::C:\Library\Developer\Toolchains\unknown-Asserts-development.xctoolchain\usr\bin;C:\Library\Swift-development\bin;C:\Library\icu-67\usr\bin"
+      - name: Install Supporting Files
+        shell: cmd
+        run: |
+          copy "%SDKROOT%\usr\share\ucrt.modulemap" "%UniversalCRTSdkDir%\Include\%UCRTVersion%\ucrt\module.modulemap"
+          copy "%SDKROOT%\usr\share\visualc.modulemap" "%VCToolsInstallDir%\include\module.modulemap"
+          copy "%SDKROOT%\usr\share\visualc.apinotes" "%VCToolsInstallDir%\include\visualc.apinotes"
+          copy "%SDKROOT%\usr\share\winsdk.modulemap" "%UniversalCRTSdkDir%\Include\%UCRTVersion%\um\module.modulemap"
+      - name: Test (Python 2)
+        run: swift test --enable-test-discovery -Xlinker /INCREMENTAL:NO
+        env:
+          PYTHON_VERSION: 2
+      - name: Test (Python 3)
+        run: swift test --enable-test-discovery
+        env:
+          PYTHON_VERSION: 3
