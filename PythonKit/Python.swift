@@ -25,6 +25,7 @@
 
 /// Typealias used when passing or returning a `PyObject` pointer with
 /// implied ownership.
+@usableFromInline
 typealias OwnedPyObjectPointer = PyObjectPointer
 
 /// A primitive reference to a Python C API `PyObject`.
