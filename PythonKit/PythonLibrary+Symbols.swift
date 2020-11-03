@@ -230,5 +230,17 @@ let PyNumber_And: PyBinaryOperation =
 let PyNumber_Or: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_Or")
 
+let PyNumber_Xor: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Xor")
+
+let PyNumber_InPlaceAnd: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceAnd")
+
+let PyNumber_InPlaceOr: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceOr")
+
+let PyNumber_InPlaceXor: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceXor")
+
 let PyNumber_Invert: PyUnaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_Invert")

@@ -1202,6 +1202,22 @@ public extension PythonObject {
         return performBinaryOp(PyNumber_Or, lhs: lhs, rhs: rhs)
     }
 
+    static func ^ (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return performBinaryOp(PyNumber_Xor, lhs: lhs, rhs: rhs)
+    }
+
+    static func &= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceAnd, lhs: lhs, rhs: rhs)
+    }
+
+    static func |= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceOr, lhs: lhs, rhs: rhs)
+    }
+
+    static func ^= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceXor, lhs: lhs, rhs: rhs)
+    }
+
     static prefix func ~ (_ operand: Self) -> Self {
         return performUnaryOp(PyNumber_Invert, operand: operand)
     }
