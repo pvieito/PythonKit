@@ -1193,6 +1193,36 @@ public extension PythonObject {
     }
 }
 
+public extension PythonObject {
+    static func & (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return performBinaryOp(PyNumber_And, lhs: lhs, rhs: rhs)
+    }
+
+    static func | (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return performBinaryOp(PyNumber_Or, lhs: lhs, rhs: rhs)
+    }
+
+    static func ^ (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return performBinaryOp(PyNumber_Xor, lhs: lhs, rhs: rhs)
+    }
+
+    static func &= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceAnd, lhs: lhs, rhs: rhs)
+    }
+
+    static func |= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceOr, lhs: lhs, rhs: rhs)
+    }
+
+    static func ^= (lhs: inout PythonObject, rhs: PythonObject) {
+        lhs = performBinaryOp(PyNumber_InPlaceXor, lhs: lhs, rhs: rhs)
+    }
+
+    static prefix func ~ (_ operand: Self) -> Self {
+        return performUnaryOp(PyNumber_Invert, operand: operand)
+    }
+}
+
 extension PythonObject : SignedNumeric {
     public init<T : BinaryInteger>(exactly value: T) {
         self.init(Int(value))
@@ -1243,28 +1273,71 @@ extension PythonObject : Equatable, Comparable {
             fatalError("No result or error returned when comparing \(self) to \(other)")
         }
     }
-    
+
     public static func == (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_EQ)
     }
-    
+ 
     public static func != (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_NE)
     }
-    
+
     public static func < (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_LT)
     }
-    
+
     public static func <= (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_LE)
     }
-    
+ 
     public static func > (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_GT)
     }
     
     public static func >= (lhs: PythonObject, rhs: PythonObject) -> Bool {
+        return lhs.compared(to: rhs, byOp: Py_GE)
+    }
+}
+
+public extension PythonObject {
+    private func compared(to other: PythonObject, byOp: Int32) -> PythonObject {
+        let lhsObject = ownedPyObject
+        let rhsObject = other.ownedPyObject
+        defer {
+            Py_DecRef(lhsObject)
+            Py_DecRef(rhsObject)
+        }
+        assert(PyErr_Occurred() == nil,
+               "Python error occurred somewhere but wasn't handled")
+        guard let result = PyObject_RichCompare(lhsObject, rhsObject, byOp) else {
+            // If a Python exception was thrown, throw a corresponding Swift error.
+            try! throwPythonErrorIfPresent()
+            fatalError("No result or error returned when comparing \(self) to \(other)")
+        }
+        return PythonObject(consuming: result)
+    }
+    
+    static func == (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return lhs.compared(to: rhs, byOp: Py_EQ)
+    }
+    
+    static func != (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return lhs.compared(to: rhs, byOp: Py_NE)
+    }
+    
+    static func < (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return lhs.compared(to: rhs, byOp: Py_LT)
+    }
+    
+    static func <= (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return lhs.compared(to: rhs, byOp: Py_LE)
+    }
+    
+    static func > (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
+        return lhs.compared(to: rhs, byOp: Py_GT)
+    }
+    
+    static func >= (lhs: PythonObject, rhs: PythonObject) -> PythonObject {
         return lhs.compared(to: rhs, byOp: Py_GE)
     }
 }

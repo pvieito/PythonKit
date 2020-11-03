@@ -116,6 +116,10 @@ let PyTuple_SetItem: @convention(c) (
     PyObjectPointer, Int, PyObjectPointer) -> Void =
     PythonLibrary.loadSymbol(name: "PyTuple_SetItem")
 
+let PyObject_RichCompare: @convention(c) (
+    PyObjectPointer, PyObjectPointer, Int32) -> PyObjectPointer? =
+    PythonLibrary.loadSymbol(name: "PyObject_RichCompare")
+
 let PyObject_RichCompareBool: @convention(c) (
     PyObjectPointer, PyObjectPointer, Int32) -> Int32 =
     PythonLibrary.loadSymbol(name: "PyObject_RichCompareBool")
@@ -219,3 +223,24 @@ let PyNumber_InPlaceTrueDivide: PyBinaryOperation =
 
 let PyNumber_Negative: PyUnaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_Negative")
+
+let PyNumber_And: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_And")
+
+let PyNumber_Or: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Or")
+
+let PyNumber_Xor: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Xor")
+
+let PyNumber_InPlaceAnd: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceAnd")
+
+let PyNumber_InPlaceOr: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceOr")
+
+let PyNumber_InPlaceXor: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceXor")
+
+let PyNumber_Invert: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Invert")
