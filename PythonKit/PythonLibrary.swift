@@ -204,9 +204,11 @@ private extension PythonLibrary {
             }
         }
         
+        #if canImport(Darwin)
         if dlsym(RTLD_SELF, "Py_Initialize") != nil {
             return RTLD_SELF
         }
+        #endif
         
         return nil
     }
