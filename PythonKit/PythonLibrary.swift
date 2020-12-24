@@ -52,6 +52,7 @@ public struct PythonLibrary {
         #if canImport(Darwin) || canImport(Glibc)
         return dlsym(libraryHandle, name)
         #elseif os(Windows)
+        guard let libraryHandle = libraryHandle else { return nil }
         let moduleHandle = libraryHandle
             .assumingMemoryBound(to: HINSTANCE__.self)
         let moduleSymbol = GetProcAddress(moduleHandle, name)
