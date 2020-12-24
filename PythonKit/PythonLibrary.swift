@@ -29,37 +29,30 @@ import WinSDK
 
 public struct PythonLibrary {
     private static let shared = PythonLibrary()
+    private static let pythonInitializeSymbolName = "Py_Initialize"
     private static let pythonLegacySymbolName = "PyString_AsString"
     private static var librarySymbolsLoaded = false
     
-    private let pythonLibraryHandle: UnsafeMutableRawPointer
+    private let pythonLibraryHandle: UnsafeMutableRawPointer?
     private let isLegacyPython: Bool
     
     private init() {
-        guard let pythonLibraryHandle = PythonLibrary.loadPythonLibrary() else {
-            fatalError("""
-                Python library not found. Set the \(Environment.library.key) \
-                environment variable with the path to a Python library.
-                """)
-        }
-        self.pythonLibraryHandle = pythonLibraryHandle
+        self.pythonLibraryHandle = PythonLibrary.loadPythonLibrary()
         
         // Check if Python is legacy (Python 2)
-        isLegacyPython = PythonLibrary.loadSymbol(
-            pythonLibraryHandle,
-            PythonLibrary.pythonLegacySymbolName) != nil
+        self.isLegacyPython = Self.loadSymbol(pythonLibraryHandle, PythonLibrary.pythonLegacySymbolName) != nil
         if isLegacyPython {
-            PythonLibrary.log(
-                "Loaded legacy Python library, using legacy symbols...")
+            PythonLibrary.log("Loaded legacy Python library, using legacy symbols...")
         }
         PythonLibrary.librarySymbolsLoaded = true
     }
     
     static func loadSymbol(
-        _ libraryHandle: UnsafeMutableRawPointer, _ name: String) -> UnsafeMutableRawPointer? {
+        _ libraryHandle: UnsafeMutableRawPointer?, _ name: String) -> UnsafeMutableRawPointer? {
         #if canImport(Darwin) || canImport(Glibc)
         return dlsym(libraryHandle, name)
         #elseif os(Windows)
+        guard let libraryHandle = libraryHandle else { return nil }
         let moduleHandle = libraryHandle
             .assumingMemoryBound(to: HINSTANCE__.self)
         let moduleSymbol = GetProcAddress(moduleHandle, name)
@@ -75,10 +68,7 @@ public struct PythonLibrary {
         }
         
         log("Loading symbol '\(name)' from the Python library...")
-        return unsafeBitCast(
-            loadSymbol(PythonLibrary.shared.pythonLibraryHandle, name),
-            to: type
-        )
+        return unsafeBitCast(loadSymbol(PythonLibrary.shared.pythonLibraryHandle, name), to: type)
     }
 }
 
@@ -184,11 +174,17 @@ private extension PythonLibrary {
         return libraryPaths
     }()
     
+    static var isPythonLibraryLoaded: Bool {
+        return self.loadSymbol(nil, self.pythonInitializeSymbolName) != nil
+    }
+    
     static func loadPythonLibrary() -> UnsafeMutableRawPointer? {
-        if let pythonLibraryPath = Environment.library.value {
-            return loadPythonLibrary(at: pythonLibraryPath)
+        if self.isPythonLibraryLoaded {
+            return nil
         }
-        
+        else if let pythonLibraryPath = Environment.library.value {
+            return self.loadPythonLibrary(at: pythonLibraryPath)
+        }
         for majorVersion in supportedMajorVersions {
             for minorVersion in supportedMinorVersions {
                 for libraryPath in libraryPaths {
@@ -201,7 +197,10 @@ private extension PythonLibrary {
                 }
             }
         }
-        return nil
+        fatalError("""
+            Python library not found. Set the \(Environment.library.key) \
+            environment variable with the path to a Python library.
+            """)
     }
     
     static func loadPythonLibrary(
@@ -221,7 +220,7 @@ private extension PythonLibrary {
             .joined(separator: libraryVersionSeparator)
         let path = path.split(separator: libraryPathVersionCharacter)
             .joined(separator: libraryVersionString)
-        return loadPythonLibrary(at: path)
+        return self.loadPythonLibrary(at: path)
     }
     
     static func loadPythonLibrary(at path: String) -> UnsafeMutableRawPointer? {
