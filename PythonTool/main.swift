@@ -17,13 +17,13 @@ struct PythonTool: ParsableCommand {
     }
     
     @Flag(name: .shortAndLong, help: "List installed modules.")
-    var list: Bool
+    var list: Bool = false
 
     @Flag(name: .shortAndLong, help: "List Python paths.")
-    var path: Bool
+    var path: Bool = false
 
     @Flag(name: .shortAndLong, help: "Verbose mode.")
-    var verbose: Bool
+    var verbose: Bool = false
 
     func run() throws {
         do {
