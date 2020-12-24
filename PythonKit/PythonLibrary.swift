@@ -27,11 +27,12 @@ import WinSDK
 // The `PythonLibrary` struct that loads Python symbols at runtime.
 //===----------------------------------------------------------------------===//
 
-var RTLD_SELF = UnsafeMutableRawPointer(bitPattern: -3)
+var RTLD_DEFAULT = UnsafeMutableRawPointer(bitPattern: -2)
 
 public struct PythonLibrary {
     private static let shared = PythonLibrary()
     private static let pythonLegacySymbolName = "PyString_AsString"
+    private static let pythonInitializationSymbolName = "Py_Initialize"
     private static var librarySymbolsLoaded = false
     
     private let pythonLibraryHandle: UnsafeMutableRawPointer
@@ -191,6 +192,12 @@ private extension PythonLibrary {
             return loadPythonLibrary(at: pythonLibraryPath)
         }
         
+        #if canImport(Darwin) || canImport(Glibc)
+        if dlsym(RTLD_DEFAULT, pythonInitializationSymbolName) != nil {
+            return RTLD_DEFAULT
+        }
+        #endif
+        
         for majorVersion in supportedMajorVersions {
             for minorVersion in supportedMinorVersions {
                 for libraryPath in libraryPaths {
@@ -203,12 +210,6 @@ private extension PythonLibrary {
                 }
             }
         }
-        
-        #if canImport(Darwin)
-        if dlsym(RTLD_SELF, "Py_Initialize") != nil {
-            return RTLD_SELF
-        }
-        #endif
         
         return nil
     }
