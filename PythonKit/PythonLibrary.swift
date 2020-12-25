@@ -27,6 +27,12 @@ import WinSDK
 // The `PythonLibrary` struct that loads Python symbols at runtime.
 //===----------------------------------------------------------------------===//
 
+#if canImport(Darwin)
+let RTLD_DEFAULT = UnsafeMutableRawPointer(bitPattern: -2)
+#else
+let RTLD_DEFAULT: UnsafeMutableRawPointer? = nil
+#endif
+
 public struct PythonLibrary {
     private static let shared = PythonLibrary()
     private static let pythonInitializeSymbolName = "Py_Initialize"
@@ -160,6 +166,10 @@ private extension PythonLibrary {
     static var libraryVersionSeparator = ""
     #endif
     
+    private static var isPythonLibraryPreloaded: Bool {
+        return self.loadSymbol(RTLD_DEFAULT, self.pythonInitializeSymbolName) != nil
+    }
+
     static let libraryPaths: [String] = {
         var libraryPaths: [String] = []
         for librarySearchPath in librarySearchPaths {
@@ -173,14 +183,10 @@ private extension PythonLibrary {
         }
         return libraryPaths
     }()
-    
-    static var isPythonLibraryLoaded: Bool {
-        return self.loadSymbol(nil, self.pythonInitializeSymbolName) != nil
-    }
-    
+        
     static func loadPythonLibrary() -> UnsafeMutableRawPointer? {
-        if self.isPythonLibraryLoaded {
-            return nil
+        if self.isPythonLibraryPreloaded {
+            return RTLD_DEFAULT
         }
         else if let pythonLibraryPath = Environment.library.value {
             return self.loadPythonLibrary(at: pythonLibraryPath)
