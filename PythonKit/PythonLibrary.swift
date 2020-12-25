@@ -71,79 +71,6 @@ public struct PythonLibrary {
     }
 }
 
-// Methods of `PythonLibrary` required to set a given Python version.
-extension PythonLibrary {
-    private static func enforceNonLoadedPythonLibrary(function: String = #function) {
-        precondition(!self.isPythonLibraryLoaded, """
-            Error: \(function) should not be called after any Python library \
-            has already been loaded.
-            """)
-    }
-    
-    public static func useVersion(_ major: Int, _ minor: Int? = nil) {
-        self.enforceNonLoadedPythonLibrary()
-        let version = PythonVersion(major: major, minor: minor)
-        PythonLibrary.Environment.version.set(version.versionString)
-    }
-    
-    public static func useLibrary(at path: String) {
-        self.enforceNonLoadedPythonLibrary()
-        PythonLibrary.Environment.library.set(path)
-    }
-}
-
-// `PythonVersion` struct that defines a given Python version.
-extension PythonLibrary {
-    private struct PythonVersion {
-        let major: Int
-        let minor: Int?
-        
-        static let versionSeparator: Character = "."
-        
-        init(major: Int, minor: Int?) {
-            self.major = major
-            self.minor = minor
-        }
-        
-        var versionString: String {
-            var versionString = String(major)
-            if let minor = minor {
-                versionString += "\(PythonVersion.versionSeparator)\(minor)"
-            }
-            return versionString
-        }
-    }
-}
-
-// `PythonLibrary.Environment` enum used to read and set environment variables.
-extension PythonLibrary {
-    private enum Environment: String {
-        private static let keyPrefix = "PYTHON"
-        private static let keySeparator = "_"
-        
-        case library = "LIBRARY"
-        case version = "VERSION"
-        case loaderLogging = "LOADER_LOGGING"
-        
-        var key: String {
-            return Environment.keyPrefix + Environment.keySeparator + rawValue
-        }
-        
-        var value: String? {
-            guard let value = getenv(key) else { return nil }
-            return String(cString: value)
-        }
-        
-        func set(_ value: String) {
-            #if canImport(Darwin) || canImport(Glibc)
-            setenv(key, value, 1)
-            #elseif os(Windows)
-            _putenv_s(key, value)
-            #endif
-        }
-    }
-}
-
 // Methods of `PythonLibrary` required to load the Python library.
 extension PythonLibrary {
     private static let supportedMajorVersions: [Int] = [3, 2]
@@ -264,6 +191,79 @@ extension PythonLibrary {
             self.log("Library at '\(path)' was sucessfully loaded.")
         }
         return pythonLibraryHandle
+    }
+}
+
+// Methods of `PythonLibrary` required to set a given Python version.
+extension PythonLibrary {
+    private static func enforceNonLoadedPythonLibrary(function: String = #function) {
+        precondition(!self.isPythonLibraryLoaded, """
+            Error: \(function) should not be called after any Python library \
+            has already been loaded.
+            """)
+    }
+    
+    public static func useVersion(_ major: Int, _ minor: Int? = nil) {
+        self.enforceNonLoadedPythonLibrary()
+        let version = PythonVersion(major: major, minor: minor)
+        PythonLibrary.Environment.version.set(version.versionString)
+    }
+    
+    public static func useLibrary(at path: String) {
+        self.enforceNonLoadedPythonLibrary()
+        PythonLibrary.Environment.library.set(path)
+    }
+}
+
+// `PythonVersion` struct that defines a given Python version.
+extension PythonLibrary {
+    private struct PythonVersion {
+        let major: Int
+        let minor: Int?
+        
+        static let versionSeparator: Character = "."
+        
+        init(major: Int, minor: Int?) {
+            self.major = major
+            self.minor = minor
+        }
+        
+        var versionString: String {
+            var versionString = String(major)
+            if let minor = minor {
+                versionString += "\(PythonVersion.versionSeparator)\(minor)"
+            }
+            return versionString
+        }
+    }
+}
+
+// `PythonLibrary.Environment` enum used to read and set environment variables.
+extension PythonLibrary {
+    private enum Environment: String {
+        private static let keyPrefix = "PYTHON"
+        private static let keySeparator = "_"
+        
+        case library = "LIBRARY"
+        case version = "VERSION"
+        case loaderLogging = "LOADER_LOGGING"
+        
+        var key: String {
+            return Environment.keyPrefix + Environment.keySeparator + rawValue
+        }
+        
+        var value: String? {
+            guard let value = getenv(key) else { return nil }
+            return String(cString: value)
+        }
+        
+        func set(_ value: String) {
+            #if canImport(Darwin) || canImport(Glibc)
+            setenv(key, value, 1)
+            #elseif os(Windows)
+            _putenv_s(key, value)
+            #endif
+        }
     }
 }
 
