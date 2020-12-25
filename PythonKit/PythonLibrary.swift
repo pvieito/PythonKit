@@ -28,10 +28,9 @@ import WinSDK
 //===----------------------------------------------------------------------===//
 
 public struct PythonLibrary {
-    private static let shared = PythonLibrary()
     private static let pythonInitializeSymbolName = "Py_Initialize"
     private static let pythonLegacySymbolName = "PyString_AsString"
-    private static var librarySymbolsLoaded = false
+    private static var isPythonLibraryLoaded = false
     
     #if canImport(Darwin)
     private static let defaultLibraryHandle = UnsafeMutableRawPointer(bitPattern: -2)  // RTLD_DEFAULT
@@ -41,60 +40,61 @@ public struct PythonLibrary {
     private static let defaultLibraryHandle: UnsafeMutableRawPointer? = nil  // Unsupported
     #endif
     
-    private let pythonLibraryHandle: UnsafeMutableRawPointer?
-    private let isLegacyPython: Bool
-    
-    private init() {
-        self.pythonLibraryHandle = PythonLibrary.loadPythonLibrary()
-        
-        // Check if Python is legacy (Python 2)
-        self.isLegacyPython = Self.loadSymbol(pythonLibraryHandle, PythonLibrary.pythonLegacySymbolName) != nil
-        if isLegacyPython {
-            PythonLibrary.log("Loaded legacy Python library, using legacy symbols...")
+    private static let pythonLibraryHandle: UnsafeMutableRawPointer? = {
+        let pythonLibraryHandle = Self.loadPythonLibrary()
+        guard Self.isPythonLibraryLoaded(at: pythonLibraryHandle) else {
+            fatalError("""
+                Python library not found. Set the \(Environment.library.key) \
+                environment variable with the path to a Python library.
+                """)
         }
-        PythonLibrary.librarySymbolsLoaded = true
-    }
+        Self.isPythonLibraryLoaded = true
+        return pythonLibraryHandle
+    }()
+    private static let isLegacyPython: Bool = {
+        let isLegacyPython = Self.loadSymbol(Self.pythonLibraryHandle, Self.pythonLegacySymbolName) != nil
+        if isLegacyPython {
+            Self.log("Loaded legacy Python library, using legacy symbols...")
+        }
+        return isLegacyPython
+    }()
     
-    static func loadSymbol(
-        _ libraryHandle: UnsafeMutableRawPointer?, _ name: String) -> UnsafeMutableRawPointer? {
-        #if canImport(Darwin) || canImport(Glibc)
-        return dlsym(libraryHandle, name)
-        #elseif os(Windows)
-        guard let libraryHandle = libraryHandle else { return nil }
-        let moduleHandle = libraryHandle
-            .assumingMemoryBound(to: HINSTANCE__.self)
-        let moduleSymbol = GetProcAddress(moduleHandle, name)
-        return unsafeBitCast(moduleSymbol, to: UnsafeMutableRawPointer?.self)
-        #endif
-    }
-    
-    static func loadSymbol<T>(
+    internal static func loadSymbol<T>(
         name: String, legacyName: String? = nil, type: T.Type = T.self) -> T {
         var name = name
-        if let legacyName = legacyName, PythonLibrary.shared.isLegacyPython {
+        if let legacyName = legacyName, self.isLegacyPython {
             name = legacyName
         }
         
         log("Loading symbol '\(name)' from the Python library...")
-        return unsafeBitCast(loadSymbol(PythonLibrary.shared.pythonLibraryHandle, name), to: type)
+        return unsafeBitCast(self.loadSymbol(self.pythonLibraryHandle, name), to: type)
     }
 }
 
 // Methods of `PythonLibrary` required to set a given Python version.
-public extension PythonLibrary {
-    static func useVersion(_ major: Int, _ minor: Int? = nil) {
-        precondition(!librarySymbolsLoaded, """
-            Error: \(#function) should not be called after any Python library \
+extension PythonLibrary {
+    private static func enforceNonLoadedPythonLibrary(function: String = #function) {
+        precondition(!self.isPythonLibraryLoaded, """
+            Error: \(function) should not be called after any Python library \
             has already been loaded.
             """)
+    }
+    
+    public static func useVersion(_ major: Int, _ minor: Int? = nil) {
+        self.enforceNonLoadedPythonLibrary()
         let version = PythonVersion(major: major, minor: minor)
         PythonLibrary.Environment.version.set(version.versionString)
+    }
+    
+    public static func usePythonLibrary(at path: String) {
+        self.enforceNonLoadedPythonLibrary()
+        PythonLibrary.Environment.library.set(path)
     }
 }
 
 // `PythonVersion` struct that defines a given Python version.
-private extension PythonLibrary {
-    struct PythonVersion {
+extension PythonLibrary {
+    private struct PythonVersion {
         let major: Int
         let minor: Int?
         
@@ -116,8 +116,8 @@ private extension PythonLibrary {
 }
 
 // `PythonLibrary.Environment` enum used to read and set environment variables.
-private extension PythonLibrary {
-    enum Environment: String {
+extension PythonLibrary {
+    private enum Environment: String {
         private static let keyPrefix = "PYTHON"
         private static let keySeparator = "_"
         
@@ -145,34 +145,30 @@ private extension PythonLibrary {
 }
 
 // Methods of `PythonLibrary` required to load the Python library.
-private extension PythonLibrary {
-    static let supportedMajorVersions: [Int] = [3, 2]
-    static let supportedMinorVersions: [Int] = Array(0...30).reversed()
+extension PythonLibrary {
+    private static let supportedMajorVersions: [Int] = [3, 2]
+    private static let supportedMinorVersions: [Int] = Array(0...30).reversed()
     
-    static let libraryPathVersionCharacter: Character = ":"
+    private static let libraryPathVersionCharacter: Character = ":"
     
     #if canImport(Darwin)
-    static var libraryNames = ["Python.framework/Versions/:/Python"]
-    static var libraryPathExtensions = [""]
-    static var librarySearchPaths = ["", "/usr/local/Frameworks/"]
-    static var libraryVersionSeparator = "."
+    private static var libraryNames = ["Python.framework/Versions/:/Python"]
+    private static var libraryPathExtensions = [""]
+    private static var librarySearchPaths = ["", "/usr/local/Frameworks/"]
+    private static var libraryVersionSeparator = "."
     #elseif os(Linux)
-    static var libraryNames = ["libpython:", "libpython:m"]
-    static var libraryPathExtensions = [".so"]
-    static var librarySearchPaths = [""]
-    static var libraryVersionSeparator = "."
+    private static var libraryNames = ["libpython:", "libpython:m"]
+    private static var libraryPathExtensions = [".so"]
+    private static var librarySearchPaths = [""]
+    private static var libraryVersionSeparator = "."
     #elseif os(Windows)
-    static var libraryNames = ["python:"]
-    static var libraryPathExtensions = [".dll"]
-    static var librarySearchPaths = [""]
-    static var libraryVersionSeparator = ""
+    private static var libraryNames = ["python:"]
+    private static var libraryPathExtensions = [".dll"]
+    private static var librarySearchPaths = [""]
+    private static var libraryVersionSeparator = ""
     #endif
     
-    private static var isPythonLibraryPreloaded: Bool {
-        return self.loadSymbol(self.defaultLibraryHandle, self.pythonInitializeSymbolName) != nil
-    }
-
-    static let libraryPaths: [String] = {
+    private static let libraryPaths: [String] = {
         var libraryPaths: [String] = []
         for librarySearchPath in librarySearchPaths {
             for libraryName in libraryNames {
@@ -185,14 +181,40 @@ private extension PythonLibrary {
         }
         return libraryPaths
     }()
+    
+    private static func loadSymbol(
+        _ libraryHandle: UnsafeMutableRawPointer?, _ name: String) -> UnsafeMutableRawPointer? {
+        #if canImport(Darwin) || canImport(Glibc)
+        return dlsym(libraryHandle, name)
+        #elseif os(Windows)
+        guard let libraryHandle = libraryHandle else { return nil }
+        let moduleHandle = libraryHandle
+            .assumingMemoryBound(to: HINSTANCE__.self)
+        let moduleSymbol = GetProcAddress(moduleHandle, name)
+        return unsafeBitCast(moduleSymbol, to: UnsafeMutableRawPointer?.self)
+        #endif
+    }
+    
+    private static func isPythonLibraryLoaded(at pythonLibraryHandle: UnsafeMutableRawPointer? = nil) -> Bool {
+        let pythonLibraryHandle = pythonLibraryHandle ?? self.defaultLibraryHandle
+        return self.loadSymbol(pythonLibraryHandle, self.pythonInitializeSymbolName) != nil
+    }
 
-    static func loadPythonLibrary() -> UnsafeMutableRawPointer? {
-        if self.isPythonLibraryPreloaded {
-            return self.defaultLibraryHandle
+    private static func loadPythonLibrary() -> UnsafeMutableRawPointer? {
+        let pythonLibraryHandle: UnsafeMutableRawPointer?
+        if self.isPythonLibraryLoaded() {
+            pythonLibraryHandle = self.defaultLibraryHandle
         }
         else if let pythonLibraryPath = Environment.library.value {
-            return self.loadPythonLibrary(at: pythonLibraryPath)
+            pythonLibraryHandle = self.loadPythonLibrary(at: pythonLibraryPath)
         }
+        else {
+            pythonLibraryHandle = self.findAndLoadExternalPythonLibrary()
+        }
+        return pythonLibraryHandle
+    }
+    
+    private static func findAndLoadExternalPythonLibrary() -> UnsafeMutableRawPointer? {
         for majorVersion in supportedMajorVersions {
             for minorVersion in supportedMinorVersions {
                 for libraryPath in libraryPaths {
@@ -205,13 +227,10 @@ private extension PythonLibrary {
                 }
             }
         }
-        fatalError("""
-            Python library not found. Set the \(Environment.library.key) \
-            environment variable with the path to a Python library.
-            """)
+        return nil
     }
     
-    static func loadPythonLibrary(
+    private static func loadPythonLibrary(
         at path: String, version: PythonVersion) -> UnsafeMutableRawPointer? {
         let versionString = version.versionString
         
@@ -231,8 +250,8 @@ private extension PythonLibrary {
         return self.loadPythonLibrary(at: path)
     }
     
-    static func loadPythonLibrary(at path: String) -> UnsafeMutableRawPointer? {
-        log("Trying to load library at '\(path)'...")
+    private static func loadPythonLibrary(at path: String) -> UnsafeMutableRawPointer? {
+        self.log("Trying to load library at '\(path)'...")
         #if canImport(Darwin) || canImport(Glibc)
         // Must be RTLD_GLOBAL because subsequent .so files from the imported python
         // modules may depend on this .so file.
@@ -242,15 +261,15 @@ private extension PythonLibrary {
         #endif
         
         if pythonLibraryHandle != nil {
-            log("Library at '\(path)' was sucessfully loaded.")
+            self.log("Library at '\(path)' was sucessfully loaded.")
         }
         return pythonLibraryHandle
     }
 }
 
 // Methods of `PythonLibrary` used for logging messages.
-private extension PythonLibrary {
-    static func log(_ message: String) {
+extension PythonLibrary {
+    private static func log(_ message: String) {
         guard Environment.loaderLogging.value != nil else { return }
         fputs(message + "\n", stderr)
     }
