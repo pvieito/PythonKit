@@ -86,7 +86,7 @@ extension PythonLibrary {
         PythonLibrary.Environment.version.set(version.versionString)
     }
     
-    public static func usePythonLibrary(at path: String) {
+    public static func useLibrary(at path: String) {
         self.enforceNonLoadedPythonLibrary()
         PythonLibrary.Environment.library.set(path)
     }
