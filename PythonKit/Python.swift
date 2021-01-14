@@ -1400,6 +1400,7 @@ extension PythonObject : Sequence {
     }
 }
 
+
 //===----------------------------------------------------------------------===//
 // `ExpressibleByLiteral` conformances
 //===----------------------------------------------------------------------===//
@@ -1517,3 +1518,139 @@ public struct PythonBytes : PythonConvertible, ConvertibleFromPython, Hashable {
         }
     }
 }
+
+//===----------------------------------------------------------------------===//
+// PythonFunction - create functions in Swift that can be called from Python
+//===----------------------------------------------------------------------===//
+
+/// Create functions in Swift that can be called from Python
+///
+/// Example:
+///
+/// The Python code `map(lambda(x: x * 2), [10, 12, 14])`  would be written as:
+///
+///     Python.map(PythonFunction { x in x * 2 }, [10, 12, 14]) // [20, 24, 28]
+///
+final public class PythonFunction {
+    /// Called directly by the Python C API
+    private let callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
+
+    public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
+        self.callSwiftFunction = { argumentsAsTuple in
+            return try fn(argumentsAsTuple[0])
+        }
+    }
+
+    /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
+    public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
+        self.callSwiftFunction = { argumentsAsTuple in
+            return try fn(argumentsAsTuple.map { $0 })
+        }
+    }
+}
+
+extension PythonFunction : PythonConvertible {
+    public var pythonObject: PythonObject {
+        _ = Python // Ensure Python is initialized.
+
+        // FIXME: Memory management issue:
+        // It is necessary to pass a retained reference to `PythonFunction` so that it
+        // outlives the `PyReference` of the PyCFunction we create below. If we don't,
+        // Python tries to access what then has become a garbage pointer when it cleans
+        // up the CFunction. This means the entire `PythonFunction` currently leaks.
+        let selfPointer = Unmanaged.passRetained(self).toOpaque()
+
+        let fnPointer = PyCFunction_New(
+            PythonFunction.sharedMethodDefinition,
+            selfPointer
+        )
+
+        // FIXME: Another potential memory management issue.
+        // I can't see how to stop these functions from being prematurely
+        // garbage collected unless we untrack it from the Python GC.
+        PyObject_GC_UnTrack(fnPointer)
+
+        return PythonObject(fnPointer)
+    }
+}
+
+// The pointers here technically constitute a leak, but no more than
+// a static string or a static struct definition at top level.
+fileprivate extension PythonFunction {
+    static let sharedFunctionName: UnsafePointer<Int8> = {
+        let name = "pythonkit_swift_function"
+        let cString = name.utf8CString
+        let copy = UnsafeMutableBufferPointer<Int8>.allocate(capacity: cString.count)
+        _ = copy.initialize(from: cString)
+        return UnsafePointer(copy.baseAddress!)
+    }()
+
+    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        /// The standard calling convention. See Python C API docs
+        let METH_VARARGS = 1 as Int32
+
+        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
+        pointer.pointee = PyMethodDef(
+            ml_name: PythonFunction.sharedFunctionName,
+            ml_meth: PythonFunction.sharedMethodImplementation,
+            ml_flags: METH_VARARGS,
+            ml_doc: nil
+        )
+
+        return pointer
+    }()
+
+    private static let sharedMethodImplementation: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? = { context, argumentsPointer in
+        guard let argumentsPointer = argumentsPointer, let selfPointer = context else {
+            return nil
+        }
+
+        let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
+
+        do {
+            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            return try self.callSwiftFunction(argumentsAsTuple).ownedPyObject
+        } catch {
+            PythonFunction.setPythonError(swiftError: error)
+            return nil // This must only be `nil` if an exception has been set
+        }
+    }
+
+    private static func setPythonError(swiftError: Error) {
+        if let pythonObject = swiftError as? PythonObject {
+            if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
+                // We are an instance of an Exception class type. Set the exception class to the object's type:
+                PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
+            } else {
+                // Assume an actual class type was thrown (rather than an instance)
+                // Crashes if it was neither a subclass of BaseException nor an instance of one.
+                //
+                // We *could* check to see whether `pythonObject` is a class here and fall back
+                // to the default case of setting a generic Exception, below, but we also want
+                // people to write valid code.
+                PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
+            }
+        } else {
+            // Make a generic Python Exception based on the Swift Error:
+            PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: swiftError)) raised in Swift: \(swiftError)")
+        }
+    }
+}
+
+extension PythonObject : Error {}
+
+// From Python's C Headers:
+struct PyMethodDef {
+    /// The name of the built-in function/method
+    public var ml_name: UnsafePointer<Int8>
+
+    /// The C function that implements it
+    public var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+
+    /// Combination of METH_xxx flags, which mostly describe the args expected by the C func
+    public var ml_flags: Int32
+
+    /// The __doc__ attribute, or NULL
+    public var ml_doc: UnsafePointer<Int8>?
+}
+>>>>>>> Squashed commit of the following:

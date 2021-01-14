@@ -20,6 +20,7 @@
 
 @usableFromInline
 typealias PyObjectPointer = UnsafeMutableRawPointer
+typealias PyMethodDefPointer = UnsafeMutableRawPointer
 typealias PyCCharPointer = UnsafePointer<Int8>
 typealias PyBinaryOperation =
     @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
@@ -55,6 +56,15 @@ let PyEval_GetBuiltins: @convention(c) () -> PyObjectPointer =
 
 let PyRun_SimpleString: @convention(c) (PyCCharPointer) -> Void =
     PythonLibrary.loadSymbol(name: "PyRun_SimpleString")
+
+let PyCFunction_New: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPointer) -> PyObjectPointer =
+    PythonLibrary.loadSymbol(name: "PyCFunction_New")
+
+let PyObject_GC_UnTrack: @convention(c) (PyObjectPointer) -> Void =
+    PythonLibrary.loadSymbol(name: "PyObject_GC_UnTrack")
+
+let PyErr_SetString: @convention(c) (PyObjectPointer, UnsafePointer<CChar>?) -> Void =
+    PythonLibrary.loadSymbol(name: "PyErr_SetString")
 
 let PyErr_Occurred: @convention(c) () -> PyObjectPointer? =
     PythonLibrary.loadSymbol(name: "PyErr_Occurred")
