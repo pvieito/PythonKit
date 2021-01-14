@@ -60,9 +60,6 @@ let PyRun_SimpleString: @convention(c) (PyCCharPointer) -> Void =
 let PyCFunction_New: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPointer) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCFunction_New")
 
-let PyObject_GC_UnTrack: @convention(c) (PyObjectPointer) -> Void =
-    PythonLibrary.loadSymbol(name: "PyObject_GC_UnTrack")
-
 let PyErr_SetString: @convention(c) (PyObjectPointer, UnsafePointer<CChar>?) -> Void =
     PythonLibrary.loadSymbol(name: "PyErr_SetString")
 

@@ -1531,21 +1531,42 @@ public struct PythonBytes : PythonConvertible, ConvertibleFromPython, Hashable {
 ///
 ///     Python.map(PythonFunction { x in x * 2 }, [10, 12, 14]) // [20, 24, 28]
 ///
-final public class PythonFunction {
+final class PyFunction {
+    private var callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
+    init(_ callSwiftFunction: @escaping (_ argumentsTuple: PythonObject) throws -> PythonConvertible) {
+        self.callSwiftFunction = callSwiftFunction
+    }
+    func callAsFunction(_ argumentsTuple: PythonObject) throws -> PythonConvertible {
+        try callSwiftFunction(argumentsTuple)
+    }
+}
+
+public struct PythonFunction {
     /// Called directly by the Python C API
-    private let callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
+    private var function: Unmanaged<PyFunction>
 
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
-        self.callSwiftFunction = { argumentsAsTuple in
+        let function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple[0])
         }
+        self.function = Unmanaged.passRetained(function)
     }
 
     /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
-        self.callSwiftFunction = { argumentsAsTuple in
+        let function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple.map { $0 })
         }
+        self.function = Unmanaged.passRetained(function)
+    }
+
+    // FIXME: Memory management issue:
+    // It is necessary to pass a retained reference to `PythonFunction` so that it
+    // outlives the `PyReference` of the PyCFunction we create below. If we don't,
+    // Python tries to access what then has become a garbage pointer when it cleans
+    // up the CFunction. This means the entire `PythonFunction` currently leaks.
+    public func deallocate() {
+        function.release()
     }
 }
 
@@ -1553,24 +1574,14 @@ extension PythonFunction : PythonConvertible {
     public var pythonObject: PythonObject {
         _ = Python // Ensure Python is initialized.
 
-        // FIXME: Memory management issue:
-        // It is necessary to pass a retained reference to `PythonFunction` so that it
-        // outlives the `PyReference` of the PyCFunction we create below. If we don't,
-        // Python tries to access what then has become a garbage pointer when it cleans
-        // up the CFunction. This means the entire `PythonFunction` currently leaks.
-        let selfPointer = Unmanaged.passRetained(self).toOpaque()
+        let funcPointer = function.toOpaque()
 
-        let fnPointer = PyCFunction_New(
+        let pyFuncPointer = PyCFunction_New(
             PythonFunction.sharedMethodDefinition,
-            selfPointer
+            funcPointer
         )
 
-        // FIXME: Another potential memory management issue.
-        // I can't see how to stop these functions from being prematurely
-        // garbage collected unless we untrack it from the Python GC.
-        PyObject_GC_UnTrack(fnPointer)
-
-        return PythonObject(fnPointer)
+        return PythonObject(consuming: pyFuncPointer)
     }
 }
 
@@ -1578,11 +1589,8 @@ extension PythonFunction : PythonConvertible {
 // a static string or a static struct definition at top level.
 fileprivate extension PythonFunction {
     static let sharedFunctionName: UnsafePointer<Int8> = {
-        let name = "pythonkit_swift_function"
-        let cString = name.utf8CString
-        let copy = UnsafeMutableBufferPointer<Int8>.allocate(capacity: cString.count)
-        _ = copy.initialize(from: cString)
-        return UnsafePointer(copy.baseAddress!)
+        let name: StaticString = "pythonkit_swift_function"
+        return UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
     }()
 
     static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
@@ -1605,11 +1613,11 @@ fileprivate extension PythonFunction {
             return nil
         }
 
-        let `self` = Unmanaged<PythonFunction>.fromOpaque(selfPointer).takeUnretainedValue()
+        let function = Unmanaged<PyFunction>.fromOpaque(selfPointer).takeUnretainedValue()
 
         do {
             let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
-            return try self.callSwiftFunction(argumentsAsTuple).ownedPyObject
+            return try function(argumentsAsTuple).ownedPyObject
         } catch {
             PythonFunction.setPythonError(swiftError: error)
             return nil // This must only be `nil` if an exception has been set
@@ -1637,7 +1645,7 @@ fileprivate extension PythonFunction {
     }
 }
 
-extension PythonObject : Error {}
+extension PythonObject: Error {}
 
 // From Python's C Headers:
 struct PyMethodDef {
