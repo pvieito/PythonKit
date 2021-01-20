@@ -1543,42 +1543,41 @@ final class PyFunction {
 
 public struct PythonFunction {
     /// Called directly by the Python C API
-    private var function: Unmanaged<PyFunction>
+    private var function: PyFunction
 
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
-        let function = PyFunction { argumentsAsTuple in
+        function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple[0])
         }
-        self.function = Unmanaged.passRetained(function)
     }
 
     /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
-        let function = PyFunction { argumentsAsTuple in
+        function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple.map { $0 })
         }
-        self.function = Unmanaged.passRetained(function)
     }
 
-    // FIXME: Memory management issue:
-    // It is necessary to pass a retained reference to `PythonFunction` so that it
-    // outlives the `PyReference` of the PyCFunction we create below. If we don't,
-    // Python tries to access what then has become a garbage pointer when it cleans
-    // up the CFunction. This means the entire `PythonFunction` currently leaks.
-    public func deallocate() {
-        function.release()
-    }
 }
 
 extension PythonFunction : PythonConvertible {
     public var pythonObject: PythonObject {
-        _ = Python // Ensure Python is initialized.
+        // Ensure Python is initialized, and check for version match.
+        let versionMajor = Python.versionInfo.major
+        let versionMinor = Python.versionInfo.minor
+        guard (versionMajor == 3 && versionMinor >= 1) || versionMajor > 3 else {
+            fatalError("PythonFunction only supports Python 3.1 and above.")
+        }
 
-        let funcPointer = function.toOpaque()
+        let funcPointer = Unmanaged.passRetained(function).toOpaque()
+        let capsulePointer = PyCapsule_New(funcPointer, nil, { capsulePointer in
+            let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
+            Unmanaged<PyFunction>.fromOpaque(funcPointer).release()
+        })
 
         let pyFuncPointer = PyCFunction_New(
             PythonFunction.sharedMethodDefinition,
-            funcPointer
+            capsulePointer
         )
 
         return PythonObject(consuming: pyFuncPointer)
@@ -1609,11 +1608,12 @@ fileprivate extension PythonFunction {
     }()
 
     private static let sharedMethodImplementation: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? = { context, argumentsPointer in
-        guard let argumentsPointer = argumentsPointer, let selfPointer = context else {
+        guard let argumentsPointer = argumentsPointer, let capsulePointer = context else {
             return nil
         }
 
-        let function = Unmanaged<PyFunction>.fromOpaque(selfPointer).takeUnretainedValue()
+        let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
+        let function = Unmanaged<PyFunction>.fromOpaque(funcPointer).takeUnretainedValue()
 
         do {
             let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
