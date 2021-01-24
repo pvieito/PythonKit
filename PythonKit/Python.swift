@@ -1134,6 +1134,119 @@ where Bound : ConvertibleFromPython {
     }
 }
 
+extension PythonObject {
+    public subscript(key0: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: PythonConvertible, key1: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[key0, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[key0, unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: PythonConvertible) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, key1]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, key1] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: PythonConvertible, key1: UnboundedRange, key2: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[key0, unboundedRange, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[key0, unboundedRange, unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: PythonConvertible, key2: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, key1, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, key1, unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: UnboundedRange, key2: PythonConvertible) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, unboundedRange, key2]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, unboundedRange, key2] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: PythonConvertible, key2: PythonConvertible) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, key1, key2]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, key1, key2] = newValue
+        }
+    }
+    public subscript(key0: PythonConvertible, key1: UnboundedRange, key2: PythonConvertible) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[key0, unboundedRange, key2]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[key0, unboundedRange, key2] = newValue
+        }
+    }
+    public subscript(key0: PythonConvertible, key1: PythonConvertible, key2: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[key0, key1, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[key0, key1, unboundedRange] = newValue
+        }
+    }
+    public subscript(key0: UnboundedRange, key1: UnboundedRange, key2: UnboundedRange) -> PythonObject {
+        get {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            return self[unboundedRange, unboundedRange, unboundedRange]
+        }
+        nonmutating set {
+            let unboundedRange = Python.slice(Python.None, Python.None, Python.None)
+            self[unboundedRange, unboundedRange, unboundedRange] = newValue
+        }
+    }
+}
+
 //===----------------------------------------------------------------------===//
 // Standard operators and conformances
 //===----------------------------------------------------------------------===//
