@@ -65,5 +65,5 @@ Fatal error: Python library not found. Set the PYTHON_LIBRARY environment variab
 
 ## Notes
 
-- Originally `PythonKit` was based on the `Python` module from the [**Swift for TensorFlow**](https://github.com/tensorflow/swift) project. The mantainers of both projects have been developing them jointly and currently `PythonKit` is distributed as part of the **Swift for TensorFlow** toolchains.
-- If you have questions about `PythonKit` you can ask on the [**Swift for TensorFlow Google Group**](https://groups.google.com/a/tensorflow.org/forum/#!forum/swift) or on the [**Swift Forums**](https://forums.swift.org).
+- Originally `PythonKit` was based on the `Python` module from the [**Swift for TensorFlow**](https://github.com/tensorflow/swift) experimental project.
+- If you have questions about `PythonKit` you can ask on the [**Swift Forums**](https://forums.swift.org/c/related-projects/).
