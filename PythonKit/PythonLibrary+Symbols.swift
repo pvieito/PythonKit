@@ -185,6 +185,20 @@ let PyString_FromStringAndSize: @convention(c) (
         name: "PyUnicode_DecodeUTF8",
         legacyName: "PyString_FromStringAndSize")
 
+let PyBytes_FromStringAndSize: @convention(c) (
+    PyCCharPointer?, Int) -> (PyObjectPointer?) =
+    PythonLibrary.loadSymbol(
+        name: "PyBytes_FromStringAndSize",
+        legacyName: "PyString_FromStringAndSize")
+
+let PyBytes_AsStringAndSize: @convention(c) (
+    PyObjectPointer,
+    UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?,
+    UnsafeMutablePointer<Int>?) -> CInt =
+    PythonLibrary.loadSymbol(
+        name: "PyBytes_AsStringAndSize",
+        legacyName: "PyString_AsStringAndSize")
+
 let _Py_ZeroStruct: PyObjectPointer =
     PythonLibrary.loadSymbol(name: "_Py_ZeroStruct")
 

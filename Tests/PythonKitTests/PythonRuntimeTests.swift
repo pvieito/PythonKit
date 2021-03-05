@@ -279,4 +279,41 @@ class PythonRuntimeTests: XCTestCase {
             _ = Bool.init(b)
         }
     }
+
+    func testPythonBytes() {
+        let bytes = PythonBytes([UInt8(1), UInt8(2), UInt8(3), UInt8(4)])
+        bytes.withUnsafeBytes {
+            XCTAssertEqual(Array($0), [1, 2, 3, 4])
+        }
+    }
+
+    func testPythonBytesInt8() {
+        let bytes = PythonBytes([Int8(1), Int8(2), Int8(3), Int8(4)])
+        bytes.withUnsafeBytes {
+            XCTAssertEqual(Array($0), [1, 2, 3, 4])
+        }
+    }
+
+    func testPythonBytesNonContiguousSequence() {
+        let bytes = PythonBytes(CollectionOfOne(UInt8(1)))
+        bytes.withUnsafeBytes {
+            XCTAssertEqual(Array($0), [1])
+        }
+    }
+
+    func testPythonBytesNonContiguousSequenceInt8() {
+        let bytes = PythonBytes(CollectionOfOne(Int8(1)))
+        bytes.withUnsafeBytes {
+            XCTAssertEqual(Array($0), [1])
+        }
+    }
+
+    func testBytesConversion() {
+        let bytes = PythonBytes(CollectionOfOne(UInt8(1)))
+        let otherBytes = PythonBytes(bytes.pythonObject)
+        otherBytes?.withUnsafeBytes {
+            XCTAssertEqual(Array($0), [1])
+        }
+        XCTAssertEqual(bytes, otherBytes)
+    }
 }
