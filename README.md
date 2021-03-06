@@ -6,6 +6,10 @@ Swift framework to interact with Python.
 
 `PythonKit` requires [**Swift 5**](https://swift.org/download/) or higher and has been tested on macOS, Linux and Windows.
 
+For Xcode projects on macOS it is necessary to set the `Enable Hardened 
+Runtime` build setting to `No`, disabling System Integrity Protection (SIP), 
+in order to allow `libpython` discovery in non-standard locations. 
+
 ## Usage
 
 Some Python code like this:
