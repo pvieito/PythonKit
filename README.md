@@ -65,7 +65,7 @@ Fatal error: Python library not found. Set the PYTHON_LIBRARY environment variab
 
 ## Troubleshooting
 
-- If your are targeting the Mac platform with the [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime) enabled make sure you are properly signing and embedding the Python framework you are trying to load with **PythonKit**. The Hardened Runtime [Library Validation mechanism](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_cs_disable-library-validation) prevents a process from loading libraries that are not signed by Apple or same developer as the main process.
+- If your are targeting the Mac platform with the [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime) enabled make sure you are properly signing and embedding the Python framework you are trying to load with **PythonKit**. The Hardened Runtime [Library Validation mechanism](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_cs_disable-library-validation) prevents a process from loading libraries that are not signed by Apple or the same developer as the main process.
 
 
 ## Notes
