@@ -1430,3 +1430,90 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
         self.init(Dictionary(elements, uniquingKeysWith: { lhs, _ in lhs }))
     }
 }
+
+public struct PythonBytes : PythonConvertible, ConvertibleFromPython, Hashable {
+    public private(set) var pythonObject: PythonObject
+
+    public init?(_ pythonObject: PythonObject) {
+        // We try to get the string/size pointers out. If it works, hooray, this is a bytes
+        // otherwise it isn't.
+        let pyObject = pythonObject.ownedPyObject
+        defer { Py_DecRef(pyObject) }
+
+        var length = 0
+        var buffer: UnsafeMutablePointer<CChar>? = nil
+
+        switch PyBytes_AsStringAndSize(pyObject, &buffer, &length) {
+        case 0:
+            self.pythonObject = pythonObject
+        default:
+            return nil
+        }
+    }
+
+    @inlinable
+    public init<Bytes: Sequence>(_ bytes: Bytes) where Bytes.Element == UInt8 {
+        let possibleSelf = bytes.withContiguousStorageIfAvailable { storagePtr in
+            PythonBytes.fromBytePointer(storagePtr)
+        }
+        if let actualSelf = possibleSelf {
+            self = actualSelf
+        } else {
+            let temporaryBuffer = Array(bytes)
+            self = temporaryBuffer.withUnsafeBufferPointer {
+                PythonBytes.fromBytePointer($0)
+            }
+        }
+    }
+
+    @inlinable
+    public init<Bytes: Sequence>(_ bytes: Bytes) where Bytes.Element == Int8 {
+        let possibleSelf = bytes.withContiguousStorageIfAvailable { storagePtr in
+            PythonBytes.fromBytePointer(storagePtr)
+        }
+        if let actualSelf = possibleSelf {
+            self = actualSelf
+        } else {
+            let temporaryBuffer = Array(bytes)
+            self = temporaryBuffer.withUnsafeBufferPointer {
+                PythonBytes.fromBytePointer($0)
+            }
+        }
+    }
+
+    private init(bytesObject: PythonObject) {
+        self.pythonObject = bytesObject
+    }
+
+    @usableFromInline
+    static func fromBytePointer(_ bytes: UnsafeBufferPointer<UInt8>) -> PythonBytes {
+        bytes.withMemoryRebound(to: Int8.self) { reboundPtr in
+            PythonBytes.fromBytePointer(reboundPtr)
+        }
+    }
+
+    @usableFromInline
+    static func fromBytePointer(_ bytes: UnsafeBufferPointer<Int8>) -> PythonBytes {
+        let v = PyBytes_FromStringAndSize(bytes.baseAddress, bytes.count)!
+        return PythonBytes(bytesObject: PythonObject(consuming: v))
+    }
+
+    public func withUnsafeBytes<ReturnValue>(
+        _ callback: (UnsafeRawBufferPointer) throws -> ReturnValue
+    ) rethrows -> ReturnValue {
+        let pyObject = self.pythonObject.ownedPyObject
+        defer { Py_DecRef(pyObject) }
+
+        var length = 0
+        var buffer: UnsafeMutablePointer<CChar>? = nil
+
+        switch PyBytes_AsStringAndSize(pyObject, &buffer, &length) {
+        case 0:
+            let buffer = UnsafeRawBufferPointer(start: buffer, count: length)
+            return try callback(buffer)
+        default:
+            try! throwPythonErrorIfPresent()
+            fatalError("No result or error getting interior buffer for bytes \(self)")
+        }
+    }
+}
