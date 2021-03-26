@@ -18,7 +18,9 @@ jobs:
         run: swift test --enable-test-discovery
         env:
           PYTHON_VERSION: 2
+          PYTHON_LOADER_LOGGING: TRUE
       - name: Test (Python 3)
         run: swift test --enable-test-discovery
         env:
           PYTHON_VERSION: 3
+          PYTHON_LOADER_LOGGING: TRUE
