@@ -29,4 +29,18 @@ class NumpyConversionTests: XCTestCase {
         XCTAssertNotEqual(numpyArrayStrided.__array_interface__["strides"], Python.None)
         XCTAssertEqual([2, 2], Array<Int32>(numpy: numpyArrayStrided))
     }
+
+    func testNumpyRangeIndexing() {
+      guard let np = NumpyConversionTests.numpyModule else { return }
+
+      let numpyArrayInt32 = np.array([-1, 4, 12, 34, 43, 24, 4, 24], dtype: np.int32)
+      let reshapedTo2x4 = numpyArrayInt32.reshape([2, 4])
+      let copiedFrom2x4WithUnboundedRange = reshapedTo2x4[0, ...]
+      XCTAssertEqual([-1, 4, 12, 34], Array<Int32>(numpy: copiedFrom2x4WithUnboundedRange))
+      let reshapedTo2x2x2 = numpyArrayInt32.reshape([2, 2, 2])
+      let copiedFrom2x2x2WithUnboundedRange = reshapedTo2x2x2[..., 0, ...]
+      XCTAssertEqual(2, copiedFrom2x2x2WithUnboundedRange.shape[0])
+      XCTAssertEqual(2, copiedFrom2x2x2WithUnboundedRange.shape[1])
+      XCTAssertEqual([-1, 4, 43, 24], Array<Int32>(numpy: copiedFrom2x2x2WithUnboundedRange.reshape([4])))
+    }
 }
