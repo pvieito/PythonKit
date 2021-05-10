@@ -270,7 +270,8 @@ extension PythonLibrary {
 // Methods of `PythonLibrary` used for logging messages.
 extension PythonLibrary {
     private static func log(_ message: String) {
-        guard Environment.loaderLogging.value != nil else { return }
+        
+//        guard Environment.loaderLogging.value != nil else { return }
         fputs(message + "\n", stderr)
     }
 }
