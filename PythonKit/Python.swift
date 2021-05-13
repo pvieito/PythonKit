@@ -673,6 +673,14 @@ public struct PythonInterface {
     public func `import`(_ name: String) -> PythonObject {
         return try! attemptImport(name)
     }
+
+    public func append(searchPaths: [String]) {
+        let paths = searchPaths.map { "'\($0)'" }.joined(separator: ",")
+        PyRun_SimpleString("""
+            import sys
+            sys.path.extend([\(paths)])
+            """)
+    }
     
     public subscript(dynamicMember name: String) -> PythonObject {
         return builtins[name]
