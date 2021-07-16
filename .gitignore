@@ -6,8 +6,8 @@
 !.travis.yml
 
 # Swift
-build/
-Package.resolved
+/build/
+/Package.resolved
 
 # Python
 *.pyc
@@ -23,8 +23,8 @@ Package.resolved
 *.override.*
 
 # Extra Directories
-/Assets
-/Extra
+/Assets/
+/Extra/
 
 # Xcode
 xcuserdata/
