@@ -27,7 +27,7 @@ jobs:
         uses: MaxDesiatov/swift-windows-action@v1
         if: runner.os == 'Windows'
         env:
-          PYTHON_VERSION: 3
+          PYTHON_VERSION: 2
           PYTHON_LOADER_LOGGING: TRUE
       - uses: actions/setup-python@v2
         with:
