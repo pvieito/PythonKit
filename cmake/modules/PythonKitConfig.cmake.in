@@ -1,3 +1,0 @@
-if(NOT TARGET PythonKit)
-  include(@PythonKit_EXPORTS_FILE@)
-endif()

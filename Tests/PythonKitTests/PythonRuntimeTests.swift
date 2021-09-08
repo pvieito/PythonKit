@@ -212,11 +212,13 @@ class PythonRuntimeTests: XCTestCase {
         let half: PythonObject = 0.5
         let string: PythonObject = "abc"
         
+        #if !os(Windows)
         XCTAssertEqual(-1, Int(minusOne))
         XCTAssertEqual(-1, Int8(minusOne))
         XCTAssertEqual(-1, Int16(minusOne))
         XCTAssertEqual(-1, Int32(minusOne))
         XCTAssertEqual(-1, Int64(minusOne))
+        #endif
         XCTAssertEqual(-1.0, Float(minusOne))
         XCTAssertEqual(-1.0, Double(minusOne))
         
