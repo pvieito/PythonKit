@@ -24,6 +24,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(2, polymorphicList[2])
     }
     
+    #if !os(Windows)
     func testPythonDict() {
         let dict: PythonObject = ["a": 1, 1: 0.5]
         XCTAssertEqual(2, Python.len(dict))
@@ -36,7 +37,6 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual("d", dict["b"])
     }
     
-    #if !os(Windows)
     func testRange() {
         let slice = PythonObject(5..<10)
         XCTAssertEqual(Python.slice(5, 10), slice)
