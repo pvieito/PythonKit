@@ -241,7 +241,9 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual("abc", String(string))
         
         XCTAssertNil(String(zero))
+        #if !os(Windows)
         XCTAssertNil(Int(string))
+        #endif
         XCTAssertNil(Double(string))
     }
     
