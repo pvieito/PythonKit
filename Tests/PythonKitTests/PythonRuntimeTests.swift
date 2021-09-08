@@ -130,6 +130,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual([-1, 0, 0, 1, 10], list.sorted())
     }
     
+    #if !os(Windows)
     func testHashable() {
         func compareHashValues(_ x: PythonConvertible) {
             let a = x.pythonObject
@@ -142,6 +143,7 @@ class PythonRuntimeTests: XCTestCase {
         compareHashValues("asdf")
         compareHashValues(PythonObject(tupleOf: 1, 2, 3))
     }
+    #endif
     
     func testRangeIteration() {
         for (index, val) in Python.range(5).enumerated() {
