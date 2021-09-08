@@ -163,6 +163,7 @@ class PythonRuntimeTests: XCTestCase {
         }
     }
     
+    #if !os(Windows)
     func testTuple() {
         let element1: PythonObject = 0
         let element2: PythonObject = "abc"
@@ -188,6 +189,7 @@ class PythonRuntimeTests: XCTestCase {
         
         XCTAssertEqual(element2, quadruple[1])
     }
+    #endif
     
     func testMethodCalling() {
         let list: PythonObject = [1, 2]
