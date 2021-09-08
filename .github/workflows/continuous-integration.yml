@@ -11,6 +11,7 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
+          - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
@@ -19,6 +20,13 @@ jobs:
           python-version: '2.7'
       - name: Test (Python 2)
         run: swift test --enable-test-discovery
+        if: runner.os != 'Windows'
+        env:
+          PYTHON_VERSION: 2
+          PYTHON_LOADER_LOGGING: TRUE
+      - name: Test (Python 2 on Windows)
+        uses: MaxDesiatov/swift-windows-action@v1
+        if: runner.os == 'Windows'
         env:
           PYTHON_VERSION: 2
           PYTHON_LOADER_LOGGING: TRUE
@@ -27,6 +35,13 @@ jobs:
           python-version: '3.x'
       - name: Test (Python 3)
         run: swift test --enable-test-discovery
+        if: runner.os != 'Windows'
+        env:
+          PYTHON_VERSION: 3
+          PYTHON_LOADER_LOGGING: TRUE
+      - name: Test (Python 3 on Windows)
+        uses: MaxDesiatov/swift-windows-action@v1
+        if: runner.os == 'Windows'
         env:
           PYTHON_VERSION: 3
           PYTHON_LOADER_LOGGING: TRUE
