@@ -36,6 +36,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual("d", dict["b"])
     }
     
+    #if !os(Windows)
     func testRange() {
         let slice = PythonObject(5..<10)
         XCTAssertEqual(Python.slice(5, 10), slice)
@@ -50,7 +51,6 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertNil(Range<Int>(PythonObject(5...)))
     }
     
-    #if !os(Windows)
     func testPartialRangeFrom() {
         let slice = PythonObject(5...)
         XCTAssertEqual(Python.slice(5, Python.None), slice)
