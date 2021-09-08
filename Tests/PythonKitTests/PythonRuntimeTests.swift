@@ -50,6 +50,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertNil(Range<Int>(PythonObject(5...)))
     }
     
+    #if !os(Windows)
     func testPartialRangeFrom() {
         let slice = PythonObject(5...)
         XCTAssertEqual(Python.slice(5, Python.None), slice)
@@ -73,6 +74,7 @@ class PythonRuntimeTests: XCTestCase {
         
         XCTAssertNil(PartialRangeUpTo<Int>(PythonObject(5...)))
     }
+    #endif
     
     func testStrideable() {
         let strideTo = stride(from: PythonObject(0), to: 100, by: 2)
