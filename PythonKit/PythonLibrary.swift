@@ -126,6 +126,11 @@ extension PythonLibrary {
         let pythonLibraryHandle = pythonLibraryHandle ?? self.defaultLibraryHandle
         return self.loadSymbol(pythonLibraryHandle, self.pythonInitializeSymbolName) != nil
     }
+    
+    public static func isPythonAvailable() -> Bool {
+        let pythonLibraryHandle = Self.loadPythonLibrary()
+        return Self.isPythonLibraryLoaded(at: pythonLibraryHandle)
+    }
 
     private static func loadPythonLibrary() -> UnsafeMutableRawPointer? {
         let pythonLibraryHandle: UnsafeMutableRawPointer?
