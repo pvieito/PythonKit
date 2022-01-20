@@ -1550,6 +1550,13 @@ public struct PythonFunction {
             return try fn(argumentsAsTuple[0])
         }
     }
+    
+    public init(_ fn: @escaping (PythonObject) throws -> Void) {
+        function = PyFunction { argumentsAsTuple in
+            try fn(argumentsAsTuple[0])
+            return Python.None
+        }
+    }
 
     /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
@@ -1557,7 +1564,13 @@ public struct PythonFunction {
             return try fn(argumentsAsTuple.map { $0 })
         }
     }
-
+    
+    public init(_ fn: @escaping ([PythonObject]) throws -> Void) {
+        function = PyFunction { argumentsAsTuple in
+            try fn(argumentsAsTuple.map { $0 })
+            return Python.None
+        }
+    }
 }
 
 extension PythonFunction : PythonConvertible {
