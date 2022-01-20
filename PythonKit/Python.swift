@@ -1584,11 +1584,10 @@ extension PythonFunction : PythonConvertible {
     }
 }
 
-// The pointers here technically constitute a leak, but no more than
-// a static string or a static struct definition at top level.
 fileprivate extension PythonFunction {
     static let sharedFunctionName: UnsafePointer<Int8> = {
         let name: StaticString = "pythonkit_swift_function"
+        // `utf8Start` is a property of StaticString, thus, it has a stable pointer.
         return UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
     }()
 
@@ -1661,4 +1660,3 @@ struct PyMethodDef {
     /// The __doc__ attribute, or NULL
     public var ml_doc: UnsafePointer<Int8>?
 }
->>>>>>> Squashed commit of the following:
