@@ -1400,6 +1400,7 @@ extension PythonObject : Sequence {
     }
 }
 
+
 //===----------------------------------------------------------------------===//
 // `ExpressibleByLiteral` conformances
 //===----------------------------------------------------------------------===//
@@ -1516,4 +1517,146 @@ public struct PythonBytes : PythonConvertible, ConvertibleFromPython, Hashable {
             fatalError("No result or error getting interior buffer for bytes \(self)")
         }
     }
+}
+
+//===----------------------------------------------------------------------===//
+// PythonFunction - create functions in Swift that can be called from Python
+//===----------------------------------------------------------------------===//
+
+/// Create functions in Swift that can be called from Python
+///
+/// Example:
+///
+/// The Python code `map(lambda(x: x * 2), [10, 12, 14])`  would be written as:
+///
+///     Python.map(PythonFunction { x in x * 2 }, [10, 12, 14]) // [20, 24, 28]
+///
+final class PyFunction {
+    private var callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
+    init(_ callSwiftFunction: @escaping (_ argumentsTuple: PythonObject) throws -> PythonConvertible) {
+        self.callSwiftFunction = callSwiftFunction
+    }
+    func callAsFunction(_ argumentsTuple: PythonObject) throws -> PythonConvertible {
+        try callSwiftFunction(argumentsTuple)
+    }
+}
+
+public struct PythonFunction {
+    /// Called directly by the Python C API
+    private var function: PyFunction
+
+    public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
+        function = PyFunction { argumentsAsTuple in
+            return try fn(argumentsAsTuple[0])
+        }
+    }
+
+    /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
+    public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
+        function = PyFunction { argumentsAsTuple in
+            return try fn(argumentsAsTuple.map { $0 })
+        }
+    }
+
+}
+
+extension PythonFunction : PythonConvertible {
+    public var pythonObject: PythonObject {
+        // Ensure Python is initialized, and check for version match.
+        let versionMajor = Python.versionInfo.major
+        let versionMinor = Python.versionInfo.minor
+        guard (versionMajor == 3 && versionMinor >= 1) || versionMajor > 3 else {
+            fatalError("PythonFunction only supports Python 3.1 and above.")
+        }
+
+        let funcPointer = Unmanaged.passRetained(function).toOpaque()
+        let capsulePointer = PyCapsule_New(funcPointer, nil, { capsulePointer in
+            let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
+            Unmanaged<PyFunction>.fromOpaque(funcPointer).release()
+        })
+
+        let pyFuncPointer = PyCFunction_New(
+            PythonFunction.sharedMethodDefinition,
+            capsulePointer
+        )
+
+        return PythonObject(consuming: pyFuncPointer)
+    }
+}
+
+fileprivate extension PythonFunction {
+    static let sharedFunctionName: UnsafePointer<Int8> = {
+        let name: StaticString = "pythonkit_swift_function"
+        // `utf8Start` is a property of StaticString, thus, it has a stable pointer.
+        return UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
+    }()
+
+    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        /// The standard calling convention. See Python C API docs
+        let METH_VARARGS = 1 as Int32
+
+        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
+        pointer.pointee = PyMethodDef(
+            ml_name: PythonFunction.sharedFunctionName,
+            ml_meth: PythonFunction.sharedMethodImplementation,
+            ml_flags: METH_VARARGS,
+            ml_doc: nil
+        )
+
+        return pointer
+    }()
+
+    private static let sharedMethodImplementation: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? = { context, argumentsPointer in
+        guard let argumentsPointer = argumentsPointer, let capsulePointer = context else {
+            return nil
+        }
+
+        let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
+        let function = Unmanaged<PyFunction>.fromOpaque(funcPointer).takeUnretainedValue()
+
+        do {
+            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            return try function(argumentsAsTuple).ownedPyObject
+        } catch {
+            PythonFunction.setPythonError(swiftError: error)
+            return nil // This must only be `nil` if an exception has been set
+        }
+    }
+
+    private static func setPythonError(swiftError: Error) {
+        if let pythonObject = swiftError as? PythonObject {
+            if Bool(Python.isinstance(pythonObject, Python.BaseException))! {
+                // We are an instance of an Exception class type. Set the exception class to the object's type:
+                PyErr_SetString(Python.type(pythonObject).ownedPyObject, pythonObject.description)
+            } else {
+                // Assume an actual class type was thrown (rather than an instance)
+                // Crashes if it was neither a subclass of BaseException nor an instance of one.
+                //
+                // We *could* check to see whether `pythonObject` is a class here and fall back
+                // to the default case of setting a generic Exception, below, but we also want
+                // people to write valid code.
+                PyErr_SetString(pythonObject.ownedPyObject, pythonObject.description)
+            }
+        } else {
+            // Make a generic Python Exception based on the Swift Error:
+            PyErr_SetString(Python.Exception.ownedPyObject, "\(type(of: swiftError)) raised in Swift: \(swiftError)")
+        }
+    }
+}
+
+extension PythonObject: Error {}
+
+// From Python's C Headers:
+struct PyMethodDef {
+    /// The name of the built-in function/method
+    public var ml_name: UnsafePointer<Int8>
+
+    /// The C function that implements it
+    public var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+
+    /// Combination of METH_xxx flags, which mostly describe the args expected by the C func
+    public var ml_flags: Int32
+
+    /// The __doc__ attribute, or NULL
+    public var ml_doc: UnsafePointer<Int8>?
 }
