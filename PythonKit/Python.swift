@@ -1649,14 +1649,14 @@ extension PythonObject: Error {}
 // From Python's C Headers:
 struct PyMethodDef {
     /// The name of the built-in function/method
-    public var ml_name: UnsafePointer<Int8>
+    var ml_name: UnsafePointer<Int8>
 
     /// The C function that implements it
-    public var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+    var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
 
     /// Combination of METH_xxx flags, which mostly describe the args expected by the C func
-    public var ml_flags: Int32
+    var ml_flags: Int32
 
     /// The __doc__ attribute, or NULL
-    public var ml_doc: UnsafePointer<Int8>?
+    var ml_doc: UnsafePointer<Int8>?
 }
