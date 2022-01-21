@@ -59,8 +59,8 @@ let PyEval_GetBuiltins: @convention(c) () -> PyObjectPointer =
 let PyRun_SimpleString: @convention(c) (PyCCharPointer) -> Void =
     PythonLibrary.loadSymbol(name: "PyRun_SimpleString")
 
-let PyCFunction_New: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPointer) -> PyObjectPointer =
-    PythonLibrary.loadSymbol(name: "PyCFunction_New")
+let PyCFunction_NewEx: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPointer, UnsafeMutableRawPointer?) -> PyObjectPointer =
+    PythonLibrary.loadSymbol(name: "PyCFunction_NewEx")
 
 let PyCapsule_New: @convention(c) (UnsafeMutableRawPointer, UnsafePointer<CChar>?, PyCapsuleDestructor) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCapsule_New")

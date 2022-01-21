@@ -1574,9 +1574,10 @@ extension PythonFunction : PythonConvertible {
             Unmanaged<PyFunction>.fromOpaque(funcPointer).release()
         })
 
-        let pyFuncPointer = PyCFunction_New(
+        let pyFuncPointer = PyCFunction_NewEx(
             PythonFunction.sharedMethodDefinition,
-            capsulePointer
+            capsulePointer,
+            nil
         )
 
         return PythonObject(consuming: pyFuncPointer)
