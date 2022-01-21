@@ -326,4 +326,22 @@ class PythonRuntimeTests: XCTestCase {
         }
         XCTAssertEqual(bytes, otherBytes)
     }
+    
+    func testPythonFunction() {
+        let versionMajor = Python.versionInfo.major
+        let versionMinor = Python.versionInfo.minor
+        guard (versionMajor == 3 && versionMinor >= 1) || versionMajor > 3 else {
+            return
+        }
+        
+        let pythonAdd = PythonFunction { (params: [PythonObject]) in
+            let lhs = params[0]
+            let rhs = params[1]
+            return lhs + rhs
+        }.pythonObject
+        
+        let pythonSum = pythonAdd(2, 3)
+        XCTAssertNotNil(Double(pythonSum))
+        XCTAssertEqual(pythonSum, 5)
+    }
 }
