@@ -188,7 +188,7 @@ extension PythonLibrary {
         #endif
         
         if pythonLibraryHandle != nil {
-            self.log("Library at '\(path)' was sucessfully loaded.")
+            self.log("Library at '\(path)' was successfully loaded.")
         }
         return pythonLibraryHandle
     }
