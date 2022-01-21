@@ -1550,25 +1550,11 @@ public struct PythonFunction {
             return try fn(argumentsAsTuple[0])
         }
     }
-    
-    public init(_ fn: @escaping (PythonObject) throws -> Void) {
-        function = PyFunction { argumentsAsTuple in
-            try fn(argumentsAsTuple[0])
-            return Python.None
-        }
-    }
 
     /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
         function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple.map { $0 })
-        }
-    }
-    
-    public init(_ fn: @escaping ([PythonObject]) throws -> Void) {
-        function = PyFunction { argumentsAsTuple in
-            try fn(argumentsAsTuple.map { $0 })
-            return Python.None
         }
     }
 }
@@ -1588,9 +1574,10 @@ extension PythonFunction : PythonConvertible {
             Unmanaged<PyFunction>.fromOpaque(funcPointer).release()
         })
 
-        let pyFuncPointer = PyCFunction_New(
+        let pyFuncPointer = PyCFunction_NewEx(
             PythonFunction.sharedMethodDefinition,
-            capsulePointer
+            capsulePointer,
+            nil
         )
 
         return PythonObject(consuming: pyFuncPointer)
@@ -1672,4 +1659,71 @@ struct PyMethodDef {
 
     /// The __doc__ attribute, or NULL
     var ml_doc: UnsafePointer<Int8>?
+}
+
+//===----------------------------------------------------------------------===//
+// PythonInstanceMethod - create functions that can be bound to a Python object
+//===----------------------------------------------------------------------===//
+
+public struct PythonInstanceMethod {
+    private var function: PythonFunction
+    
+    public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
+        function = PythonFunction(fn)
+    }
+    
+    public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
+        function = PythonFunction(fn)
+    }
+}
+
+extension PythonInstanceMethod : PythonConvertible {
+    public var pythonObject: PythonObject {
+        let pyFuncPointer = function.pythonObject.ownedPyObject
+        let methodPointer = PyInstanceMethod_New(pyFuncPointer)
+        return PythonObject(consuming: methodPointer)
+    }
+}
+
+//===----------------------------------------------------------------------===//
+// PythonClass - construct subclasses of a Python class
+//===----------------------------------------------------------------------===//
+
+public struct PythonClass {
+    private var typeObject: PythonObject
+    
+    public struct Members: ExpressibleByDictionaryLiteral {
+        public typealias Key = String
+        public typealias Value = PythonConvertible
+        
+        var dictionary: [String: PythonObject]
+        
+        public init(dictionaryLiteral elements: (Key, Value)...) {
+            let castedElements = elements.map { (key, value) in
+                (key, value.pythonObject)
+            }
+            
+            dictionary = Dictionary(castedElements, uniquingKeysWith: { lhs, _ in lhs })
+        }
+    }
+
+    public init(_ name: String, superclasses: [PythonObject] = [], members: Members = [:]) {
+        self.init(name, superclasses: superclasses, members: members.dictionary)
+    }
+    
+    public init(_ name: String, superclasses: [PythonObject] = [], members: [String: PythonObject] = [:]) {
+        var trueSuperclasses = superclasses
+        if !trueSuperclasses.contains(Python.object) {
+            trueSuperclasses.append(Python.object)
+        }
+        
+        let superclassesTuple = PythonObject(tupleContentsOf: trueSuperclasses)
+        typeObject = Python.type(name, superclassesTuple, members.pythonObject)
+    }
+}
+
+extension PythonClass : PythonConvertible {
+    public var pythonObject: PythonObject {
+        typeObject
+    }
 }
