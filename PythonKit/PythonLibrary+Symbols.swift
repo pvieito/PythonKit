@@ -62,6 +62,9 @@ let PyRun_SimpleString: @convention(c) (PyCCharPointer) -> Void =
 let PyCFunction_NewEx: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPointer, UnsafeMutableRawPointer?) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCFunction_NewEx")
 
+let PyInstanceMethod_New: @convention(c) (PyObjectPointer) -> PyObjectPointer =
+    PythonLibrary.loadSymbol(name: "PyInstanceMethod_New")
+
 let PyCapsule_New: @convention(c) (UnsafeMutableRawPointer, UnsafePointer<CChar>?, PyCapsuleDestructor) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCapsule_New")
 
