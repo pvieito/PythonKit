@@ -23,7 +23,7 @@ Can be implemented in Swift through PythonKit with the following code:
 ```swift
 import PythonKit
 
-let sys = try Python.import("sys")
+let sys = Python.import("sys")
 
 print("Python \(sys.version_info.major).\(sys.version_info.minor)")
 print("Python Version: \(sys.version)")
