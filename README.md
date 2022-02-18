@@ -5,10 +5,6 @@
 
 Swift framework to interact with Python.
 
-## Requirements
-
-**PythonKit** requires [**Swift 5**](https://swift.org/download/) or higher and has been tested on macOS, Linux and Windows.
-
 ## Usage
 
 Some Python code like this:
