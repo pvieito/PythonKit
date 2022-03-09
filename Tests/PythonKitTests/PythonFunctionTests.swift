@@ -127,7 +127,7 @@ class PythonFunctionTests: XCTestCase {
                     helloOutput = String(message)
                     
                     // Conventional `super` syntax causes problems; use this instead.
-                    Python.Exception.__init__(self, message)
+                    Python.Exception.__init__(`self`, message)
                     return Python.None
                 },
                 
@@ -151,7 +151,7 @@ class PythonFunctionTests: XCTestCase {
                     `self`.int_param = params[2]
                     
                     // Conventional `super` syntax causes problems; use this instead.
-                    HelloException.__init__(self, message)
+                    HelloException.__init__(`self`, message)
                     return Python.None
                 },
                 
