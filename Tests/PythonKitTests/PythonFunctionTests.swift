@@ -84,6 +84,14 @@ class PythonFunctionTests: XCTestCase {
         XCTAssertEqual(printOutput, "Class Dynamically Created!")
     }
     
+    // There is a build error where passing a simple `PythonClass.Members` 
+    // literal makes the literal's type ambiguous. It is confused with
+    // `[String: PythonObject]`. To fix this error, we add a
+    // `@_disfavoredOverload` attribute to the more specific initializer.
+    func testPythonClassInitializer() {
+        
+    }
+    
     func testPythonClassInheritance() {
         guard canUsePythonFunction else {
             return
