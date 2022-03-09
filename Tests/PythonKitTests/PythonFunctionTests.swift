@@ -89,7 +89,20 @@ class PythonFunctionTests: XCTestCase {
     // `[String: PythonObject]`. To fix this error, we add a
     // `@_disfavoredOverload` attribute to the more specific initializer.
     func testPythonClassInitializer() {
+        guard canUsePythonFunction else {
+            return
+        }
         
+        let MyClass = PythonClass(
+            "MyClass",
+            superclasses: [Python.object],
+            members: [
+              "memberName": "memberValue",
+            ]
+        ).pythonObject
+        
+        let memberValue = MyClass().memberName
+        XCTAssertEqual(String(memberValue), "memberValue")
     }
     
     func testPythonClassInheritance() {
