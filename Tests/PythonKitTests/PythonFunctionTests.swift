@@ -84,6 +84,27 @@ class PythonFunctionTests: XCTestCase {
         XCTAssertEqual(printOutput, "Class Dynamically Created!")
     }
     
+    // There is a build error where passing a simple `PythonClass.Members` 
+    // literal makes the literal's type ambiguous. It is confused with
+    // `[String: PythonObject]`. To fix this error, we add a
+    // `@_disfavoredOverload` attribute to the more specific initializer.
+    func testPythonClassInitializer() {
+        guard canUsePythonFunction else {
+            return
+        }
+        
+        let MyClass = PythonClass(
+            "MyClass",
+            superclasses: [Python.object],
+            members: [
+              "memberName": "memberValue",
+            ]
+        ).pythonObject
+        
+        let memberValue = MyClass().memberName
+        XCTAssertEqual(String(memberValue), "memberValue")
+    }
+    
     func testPythonClassInheritance() {
         guard canUsePythonFunction else {
             return
@@ -106,7 +127,7 @@ class PythonFunctionTests: XCTestCase {
                     helloOutput = String(message)
                     
                     // Conventional `super` syntax causes problems; use this instead.
-                    Python.Exception.__init__(self, message)
+                    Python.Exception.__init__(`self`, message)
                     return Python.None
                 },
                 
@@ -130,7 +151,7 @@ class PythonFunctionTests: XCTestCase {
                     `self`.int_param = params[2]
                     
                     // Conventional `super` syntax causes problems; use this instead.
-                    HelloException.__init__(self, message)
+                    HelloException.__init__(`self`, message)
                     return Python.None
                 },
                 

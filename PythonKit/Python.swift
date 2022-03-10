@@ -1711,6 +1711,7 @@ public struct PythonClass {
         self.init(name, superclasses: superclasses, members: members.dictionary)
     }
     
+    @_disfavoredOverload
     public init(_ name: String, superclasses: [PythonObject] = [], members: [String: PythonObject] = [:]) {
         var trueSuperclasses = superclasses
         if !trueSuperclasses.contains(Python.object) {
