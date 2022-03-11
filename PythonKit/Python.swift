@@ -1400,6 +1400,11 @@ extension PythonObject : Sequence {
     }
 }
 
+extension PythonObject {
+    public var count: Int { 
+        Int(Python.len(self))!
+    }
+}
 
 //===----------------------------------------------------------------------===//
 // `ExpressibleByLiteral` conformances
