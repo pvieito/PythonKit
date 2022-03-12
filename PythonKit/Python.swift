@@ -394,6 +394,10 @@ public struct ThrowingPythonObject {
         }
         return (elt0, elt1, elt2, elt3)
     }
+    
+    public var count: Int? {
+        base.checking.count
+    }
 }
 
 
@@ -506,6 +510,10 @@ public struct CheckingPythonObject {
                 return nil
         }
         return (elt0, elt1, elt2, elt3)
+    }
+    
+    public var count: Int? {
+        Int(Python.len(base))
     }
 }
 
@@ -1402,7 +1410,7 @@ extension PythonObject : Sequence {
 
 extension PythonObject {
     public var count: Int { 
-        Int(Python.len(self))!
+        checking.count!
     }
 }
 
