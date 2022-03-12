@@ -20,7 +20,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(1.5, polymorphicList[3])
         XCTAssertEqual(1.5, polymorphicList[-1])
         
-        XCTAssertEqual(4, polymorphicList.count)
+        XCTAssertEqual(4, polymorphicList.count as Int)
         XCTAssertEqual(4, polymorphicList.checking.count!)
         XCTAssertEqual(4, polymorphicList.throwing.count!)
         
@@ -35,7 +35,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(1, dict["a"])
         XCTAssertEqual(0.5, dict[1])
       
-        XCTAssertEqual(2, dict.count)
+        XCTAssertEqual(2, dict.count as Int)
         XCTAssertEqual(2, dict.checking.count!)
         XCTAssertEqual(2, dict.throwing.count!)
         
