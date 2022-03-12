@@ -26,8 +26,6 @@ typealias PyBinaryOperation =
     @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
 typealias PyUnaryOperation =
     @convention(c) (PyObjectPointer?) -> PyObjectPointer?
-typealias PyCapsuleDestructor =
-    @convention(c) (PyObjectPointer?) -> Void
 
 let Py_LT: Int32 = 0
 let Py_LE: Int32 = 1
@@ -65,7 +63,9 @@ let PyCFunction_NewEx: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPoint
 let PyInstanceMethod_New: @convention(c) (PyObjectPointer) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyInstanceMethod_New")
 
-let PyCapsule_New: @convention(c) (UnsafeMutableRawPointer, UnsafePointer<CChar>?, PyCapsuleDestructor) -> PyObjectPointer =
+let PyCapsule_New: @convention(c) (
+    UnsafeMutableRawPointer, UnsafePointer<CChar>?,
+    @convention(c) @escaping (PyObjectPointer?) -> Void) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCapsule_New")
 
 let PyCapsule_GetPointer: @convention(c) (PyObjectPointer?, UnsafePointer<CChar>?) -> UnsafeMutableRawPointer =
