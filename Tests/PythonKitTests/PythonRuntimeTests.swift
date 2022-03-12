@@ -35,9 +35,9 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(1, dict["a"])
         XCTAssertEqual(0.5, dict[1])
       
-        XCTAssertEqual(2, polymorphicList.count)
-        XCTAssertEqual(2, polymorphicList.checking.count!)
-        XCTAssertEqual(2, polymorphicList.throwing.count!)
+        XCTAssertEqual(2, dict.count)
+        XCTAssertEqual(2, dict.checking.count!)
+        XCTAssertEqual(2, dict.throwing.count!)
         
         dict["b"] = "c"
         XCTAssertEqual("c", dict["b"])
