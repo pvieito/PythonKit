@@ -241,6 +241,9 @@ let PyNumber_Multiply: PyBinaryOperation =
 let PyNumber_TrueDivide: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_TrueDivide")
 
+let PyNumber_Power: @convention(c) (PyObjectPointer?, PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? =
+    PythonLibrary.loadSymbol(name: "PyNumber_Power")
+
 let PyNumber_InPlaceAdd: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceAdd")
 
