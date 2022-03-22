@@ -1232,7 +1232,7 @@ public extension PythonObject {
 }
 
 public func pow(_ lhs: PythonObject, _ rhs: PythonObject) -> PythonObject {
-    let result = PyNumber_Power(lhs.borrowedPyObject, rhs.borrowedPyObject, Python.None)
+    let result = PyNumber_Power(lhs.borrowedPyObject, rhs.borrowedPyObject, Python.None.borrowedPyObject)
     try! throwPythonErrorIfPresent()
     return PythonObject(consuming: result!)
 }
