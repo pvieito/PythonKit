@@ -1231,10 +1231,62 @@ public extension PythonObject {
     }
 }
 
-public func pow(_ lhs: PythonObject, _ rhs: PythonObject) -> PythonObject {
-    let result = PyNumber_Power(lhs.borrowedPyObject, rhs.borrowedPyObject, Python.None.borrowedPyObject)
-    try! throwPythonErrorIfPresent()
-    return PythonObject(consuming: result!)
+public enum PythonNumber {
+    private static func performBinaryOp(_ op: PythonBinaryOp, lhs: PythonObject, rhs: PythonObject) throws -> PythonObject {
+        let result = op(lhs.borrowedPyObject, rhs.borrowedPyObject)
+        // If binary operation fails (e.g. due to `TypeError`), throw an exception.
+        try throwPythonErrorIfPresent()
+        return PythonObject(consuming: result!)
+    }
+
+    private static func performUnaryOp(_ op: PythonUnaryOp, operand: PythonObject) throws -> PythonObject {
+        let result = op(operand.borrowedPyObject)
+        // If unary operation fails (e.g. due to `TypeError`), throw an exception.
+        try throwPythonErrorIfPresent()
+        return PythonObject(consuming: result!)
+    }
+
+    public static func add(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Add, lhs: lhs, rhs: rhs) }
+    public static func subtract(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Subtract, lhs: lhs, rhs: rhs) }
+    public static func multiply(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Multiply, lhs: lhs, rhs: rhs) }
+    public static func matrixMultiply(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_MatrixMultiply, lhs: lhs, rhs: rhs) }
+    public static func floorDivide(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_FloorDivide, lhs: lhs, rhs: rhs) }
+    public static func trueDivide(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_TrueDivide, lhs: lhs, rhs: rhs) }
+    public static func remainder(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Remainder, lhs: lhs, rhs: rhs) }
+    public static func negative(_ operand: PythonObject) throws -> PythonObject { try performUnaryOp(PyNumber_Negative, operand: operand) }
+    public static func positive(_ operand: PythonObject) throws -> PythonObject { try performUnaryOp(PyNumber_Positive, operand: operand) }
+    public static func invert(_ operand: PythonObject) throws -> PythonObject { try performUnaryOp(PyNumber_Invert, operand: operand) }
+    public static func lshift(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Lshift, lhs: lhs, rhs: rhs) }
+    public static func rshift(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Rshift, lhs: lhs, rhs: rhs) }
+    public static func and(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_And, lhs: lhs, rhs: rhs) }
+    public static func xor(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Xor, lhs: lhs, rhs: rhs) }
+    public static func or(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Or, lhs: lhs, rhs: rhs) }
+
+    public static func power(_ lhs: PythonObject, _ rhs: PythonObject, modulus: PythonObject = Python.None) throws -> PythonObject {
+        let result = PyNumber_Power(lhs.borrowedPyObject, rhs.borrowedPyObject, modulus.borrowedPyObject)
+        try throwPythonErrorIfPresent()
+        return PythonObject(consuming: result!)
+    }
+
+    public static func inPlaceAdd(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceAdd, lhs: lhs, rhs: rhs) }
+    public static func inPlaceSubtract(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceSubtract, lhs: lhs, rhs: rhs) }
+    public static func inPlaceMultiply(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceMultiply, lhs: lhs, rhs: rhs) }
+    public static func inPlaceMatrixMultiply(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceMatrixMultiply, lhs: lhs, rhs: rhs) }
+    public static func inPlaceFloorDivide(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceFloorDivide, lhs: lhs, rhs: rhs) }
+    public static func inPlaceTrueDivide(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceTrueDivide, lhs: lhs, rhs: rhs) }
+    public static func inPlaceRemainder(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceRemainder, lhs: lhs, rhs: rhs) }
+    public static func inPlaceLshift(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceLshift, lhs: lhs, rhs: rhs) }
+    public static func inPlaceRshift(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceRshift, lhs: lhs, rhs: rhs) }
+    public static func inPlaceAnd(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceAnd, lhs: lhs, rhs: rhs) }
+    public static func inPlaceXor(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceOr, lhs: lhs, rhs: rhs) }
+    public static func inPlaceOr(_ lhs: inout PythonObject, _ rhs: PythonObject) throws { lhs = try performBinaryOp(PyNumber_InPlaceXor, lhs: lhs, rhs: rhs) }
+
+    public static func inPlacePower(_ lhs: inout PythonObject, _ rhs: PythonObject, modulus: PythonObject = Python.None) throws {
+        let result = PyNumber_InPlacePower(lhs.borrowedPyObject, rhs.borrowedPyObject, modulus.borrowedPyObject)
+        try throwPythonErrorIfPresent()
+        lhs = PythonObject(consuming: result!)
+    }
+
 }
 
 extension PythonObject : SignedNumeric {

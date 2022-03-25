@@ -238,11 +238,44 @@ let PyNumber_Subtract: PyBinaryOperation =
 let PyNumber_Multiply: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_Multiply")
 
+let PyNumber_MatrixMultiply: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_MatrixMultiply")
+
+let PyNumber_FloorDivide: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_FloorDivide")
+
 let PyNumber_TrueDivide: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_TrueDivide")
 
+let PyNumber_Remainder: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Remainder")
+
 let PyNumber_Power: @convention(c) (PyObjectPointer?, PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? =
     PythonLibrary.loadSymbol(name: "PyNumber_Power")
+
+let PyNumber_Negative: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Negative")
+
+let PyNumber_Positive: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Positive")
+
+let PyNumber_Invert: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Invert")
+
+let PyNumber_Lshift: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Lshift")
+
+let PyNumber_Rshift: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Rshift")
+
+let PyNumber_And: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_And")
+
+let PyNumber_Xor: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Xor")
+
+let PyNumber_Or: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_Or")
 
 let PyNumber_InPlaceAdd: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceAdd")
@@ -253,20 +286,26 @@ let PyNumber_InPlaceSubtract: PyBinaryOperation =
 let PyNumber_InPlaceMultiply: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceMultiply")
 
+let PyNumber_InPlaceMatrixMultiply: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceMatrixMultiply")
+
+let PyNumber_InPlaceFloorDivide: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceFloorDivide")
+
 let PyNumber_InPlaceTrueDivide: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceTrueDivide")
 
-let PyNumber_Negative: PyUnaryOperation =
-    PythonLibrary.loadSymbol(name: "PyNumber_Negative")
+let PyNumber_InPlaceRemainder: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceRemainder")
 
-let PyNumber_And: PyBinaryOperation =
-    PythonLibrary.loadSymbol(name: "PyNumber_And")
+let PyNumber_InPlacePower: @convention(c) (PyObjectPointer?, PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlacePower")
 
-let PyNumber_Or: PyBinaryOperation =
-    PythonLibrary.loadSymbol(name: "PyNumber_Or")
+let PyNumber_InPlaceLshift: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceLshift")
 
-let PyNumber_Xor: PyBinaryOperation =
-    PythonLibrary.loadSymbol(name: "PyNumber_Xor")
+let PyNumber_InPlaceRshift: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PyNumber_InPlaceRshift")
 
 let PyNumber_InPlaceAnd: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceAnd")
@@ -276,6 +315,3 @@ let PyNumber_InPlaceOr: PyBinaryOperation =
 
 let PyNumber_InPlaceXor: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceXor")
-
-let PyNumber_Invert: PyUnaryOperation =
-    PythonLibrary.loadSymbol(name: "PyNumber_Invert")
