@@ -1239,14 +1239,12 @@ extension ThrowingPythonObject {
 
     private static func performBinaryOp(_ op: PythonBinaryOp, lhs: PythonObject, rhs: PythonObject) throws -> PythonObject {
         let result = op(lhs.borrowedPyObject, rhs.borrowedPyObject)
-        // If binary operation fails (e.g. due to `TypeError`), throw an exception.
         try throwPythonErrorIfPresent()
         return PythonObject(consuming: result!)
     }
 
     private static func performUnaryOp(_ op: PythonUnaryOp, operand: PythonObject) throws -> PythonObject {
         let result = op(operand.borrowedPyObject)
-        // If unary operation fails (e.g. due to `TypeError`), throw an exception.
         try throwPythonErrorIfPresent()
         return PythonObject(consuming: result!)
     }
@@ -1266,6 +1264,12 @@ extension ThrowingPythonObject {
     public static func and(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_And, lhs: lhs, rhs: rhs) }
     public static func xor(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Xor, lhs: lhs, rhs: rhs) }
     public static func or(_ lhs: PythonObject, _ rhs: PythonObject) throws -> PythonObject { try performBinaryOp(PyNumber_Or, lhs: lhs, rhs: rhs) }
+
+    public static func contains(_ sequence: PythonObject, _ x: PythonObject) throws -> Bool {
+        let result = PySequence_Contains(sequence.borrowedPyObject, x.borrowedPyObject)
+        try throwPythonErrorIfPresent()
+        return (result == 1)
+    }
 
     public static func power(_ lhs: PythonObject, _ rhs: PythonObject, modulus: PythonObject = Python.None) throws -> PythonObject {
         let result = PyNumber_Power(lhs.borrowedPyObject, rhs.borrowedPyObject, modulus.borrowedPyObject)
@@ -1291,8 +1295,6 @@ extension ThrowingPythonObject {
         try throwPythonErrorIfPresent()
         lhs = PythonObject(consuming: result!)
     }
-
-    public static func contains(_ sequence: PythonObject, _ x: PythonObject) throws -> PythonObject { try performBinaryOp(PySequence_Contains, lhs: sequence, rhs: x) }
 }
 
 extension PythonObject : SignedNumeric {

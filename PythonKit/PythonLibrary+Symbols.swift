@@ -319,5 +319,5 @@ let PyNumber_InPlaceOr: PyBinaryOperation =
 let PyNumber_InPlaceXor: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceXor")
 
-let PySequence_Contains: PyBinaryOperation =
+let PySequence_Contains: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> Int32 =
     PythonLibrary.loadSymbol(name: "PySequence_Contains")
