@@ -1373,6 +1373,10 @@ extension PythonObject : Equatable, Comparable {
     public static func === (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.reference === rhs.reference
     }
+
+    public static func !== (lhs: PythonObject, rhs: PythonObject) -> Bool {
+        return lhs.reference !== rhs.reference
+    }
 }
 
 public extension PythonObject {
