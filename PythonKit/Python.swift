@@ -1231,7 +1231,12 @@ public extension PythonObject {
     }
 }
 
-public enum PythonNumber {
+extension ThrowingPythonObject {
+
+    public static func not(_ operand: PythonObject) throws -> PythonObject {
+        return try performUnaryOp(PyObject_Not, operand: operand)
+    }
+
     private static func performBinaryOp(_ op: PythonBinaryOp, lhs: PythonObject, rhs: PythonObject) throws -> PythonObject {
         let result = op(lhs.borrowedPyObject, rhs.borrowedPyObject)
         // If binary operation fails (e.g. due to `TypeError`), throw an exception.
@@ -1287,6 +1292,7 @@ public enum PythonNumber {
         lhs = PythonObject(consuming: result!)
     }
 
+    public static func contains(_ sequence: PythonObject, _ x: PythonObject) throws -> PythonObject { try performBinaryOp(PySequence_Contains, lhs: sequence, rhs: x) }
 }
 
 extension PythonObject : SignedNumeric {
@@ -1362,6 +1368,10 @@ extension PythonObject : Equatable, Comparable {
     
     public static func >= (lhs: PythonObject, rhs: PythonObject) -> Bool {
         return lhs.compared(to: rhs, byOp: Py_GE)
+    }
+
+    public static func === (lhs: PythonObject, rhs: PythonObject) -> Bool {
+        return lhs.reference === rhs.reference
     }
 }
 

@@ -122,6 +122,9 @@ let PyObject_SetAttrString: @convention(c) (
     PyObjectPointer, PyCCharPointer, PyObjectPointer) -> Int32 =
     PythonLibrary.loadSymbol(name: "PyObject_SetAttrString")
 
+let PyObject_Not: PyUnaryOperation =
+    PythonLibrary.loadSymbol(name: "PyObject_Not")
+
 let PySlice_New: @convention(c) (
     PyObjectPointer?, PyObjectPointer?,
     PyObjectPointer?) -> PyObjectPointer? =
@@ -315,3 +318,6 @@ let PyNumber_InPlaceOr: PyBinaryOperation =
 
 let PyNumber_InPlaceXor: PyBinaryOperation =
     PythonLibrary.loadSymbol(name: "PyNumber_InPlaceXor")
+
+let PySequence_Contains: PyBinaryOperation =
+    PythonLibrary.loadSymbol(name: "PySequence_Contains")
