@@ -63,9 +63,13 @@ let PyCFunction_NewEx: @convention(c) (PyMethodDefPointer, UnsafeMutableRawPoint
 let PyInstanceMethod_New: @convention(c) (PyObjectPointer) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyInstanceMethod_New")
 
+/// The last argument would ideally be of type `@convention(c) (PyObjectPointer?) -> Void`.
+/// Due to SR-15871 and the source-breaking nature of potential workarounds, the
+/// static typing was removed. The caller must now manually cast a closure to
+/// `OpaquePointer` before passing it into `PyCapsule_New`.
 let PyCapsule_New: @convention(c) (
     UnsafeMutableRawPointer, UnsafePointer<CChar>?,
-    @convention(c) @escaping (PyObjectPointer?) -> Void) -> PyObjectPointer =
+    OpaquePointer) -> PyObjectPointer =
     PythonLibrary.loadSymbol(name: "PyCapsule_New")
 
 let PyCapsule_GetPointer: @convention(c) (PyObjectPointer?, UnsafePointer<CChar>?) -> UnsafeMutableRawPointer =

@@ -322,6 +322,21 @@ public struct ThrowingPythonObject {
     public func dynamicallyCall(
         withKeywordArguments args:
         KeyValuePairs<String, PythonConvertible> = [:]) throws -> PythonObject {
+        return try _dynamicallyCall(args)
+    }
+    
+    /// Alias for the function above that lets the caller dynamically construct the argument list, without using a dictionary literal.
+    /// This function must be called explicitly on a `PythonObject` because `@dynamicCallable` does not recognize it.
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        [(key: String, value: PythonConvertible)] = []) throws -> PythonObject {
+        return try _dynamicallyCall(args)
+    }
+    
+    /// Implementation of `dynamicallyCall(withKeywordArguments)`.
+    private func _dynamicallyCall<T : Collection>(_ args: T) throws -> PythonObject
+    where T.Element == (key: String, value: PythonConvertible) {
         try throwPythonErrorIfPresent()
         
         // An array containing positional arguments.
@@ -615,6 +630,15 @@ public extension PythonObject {
         KeyValuePairs<String, PythonConvertible> = [:]) -> PythonObject {
         return try! throwing.dynamicallyCall(withKeywordArguments: args)
     }
+    
+    /// Alias for the function above that lets the caller dynamically construct the argument list, without using a dictionary literal.
+    /// This function must be called explicitly on a `PythonObject` because `@dynamicCallable` does not recognize it.
+    @discardableResult
+    func dynamicallyCall(
+        withKeywordArguments args:
+        [(key: String, value: PythonConvertible)] = []) -> PythonObject {
+        return try! throwing.dynamicallyCall(withKeywordArguments: args)
+    }
 }
 
 //===----------------------------------------------------------------------===//
@@ -705,14 +729,13 @@ public struct PythonInterface {
 
 // Create a Python tuple object with the specified elements.
 private func pyTuple<T : Collection>(_ vals: T) -> OwnedPyObjectPointer
-    where T.Element : PythonConvertible {
-        
-        let tuple = PyTuple_New(vals.count)!
-        for (index, element) in vals.enumerated() {
-            // `PyTuple_SetItem` steals the reference of the object stored.
-            PyTuple_SetItem(tuple, index, element.ownedPyObject)
-        }
-        return tuple
+where T.Element : PythonConvertible {
+    let tuple = PyTuple_New(vals.count)!
+    for (index, element) in vals.enumerated() {
+        // `PyTuple_SetItem` steals the reference of the object stored.
+        PyTuple_SetItem(tuple, index, element.ownedPyObject)
+    }
+    return tuple
 }
 
 public extension PythonObject {
@@ -723,13 +746,13 @@ public extension PythonObject {
     }
     
     init<T : Collection>(tupleContentsOf elements: T)
-        where T.Element == PythonConvertible {
-            self.init(consuming: pyTuple(elements.map { $0.pythonObject }))
+    where T.Element == PythonConvertible {
+        self.init(consuming: pyTuple(elements.map { $0.pythonObject }))
     }
     
     init<T : Collection>(tupleContentsOf elements: T)
-        where T.Element : PythonConvertible {
-            self.init(consuming: pyTuple(elements))
+    where T.Element : PythonConvertible {
+        self.init(consuming: pyTuple(elements))
     }
 }
 
@@ -1149,7 +1172,7 @@ where Bound : ConvertibleFromPython {
 private typealias PythonBinaryOp =
     (OwnedPyObjectPointer?, OwnedPyObjectPointer?) -> OwnedPyObjectPointer?
 private typealias PythonUnaryOp =
-    (OwnedPyObjectPointer?) -> OwnedPyObjectPointer?    
+    (OwnedPyObjectPointer?) -> OwnedPyObjectPointer?
 
 private func performBinaryOp(
     _ op: PythonBinaryOp, lhs: PythonObject, rhs: PythonObject) -> PythonObject {
@@ -1409,7 +1432,7 @@ extension PythonObject : Sequence {
 }
 
 extension PythonObject {
-    public var count: Int { 
+    public var count: Int {
         checking.count!
     }
 }
@@ -1545,29 +1568,87 @@ public struct PythonBytes : PythonConvertible, ConvertibleFromPython, Hashable {
 ///     Python.map(PythonFunction { x in x * 2 }, [10, 12, 14]) // [20, 24, 28]
 ///
 final class PyFunction {
-    private var callSwiftFunction: (_ argumentsTuple: PythonObject) throws -> PythonConvertible
-    init(_ callSwiftFunction: @escaping (_ argumentsTuple: PythonObject) throws -> PythonConvertible) {
-        self.callSwiftFunction = callSwiftFunction
+    enum CallingConvention {
+        case varArgs
+        case varArgsWithKeywords
     }
+    
+    /// Allows `PyFunction` to store Python functions with more than one possible calling convention
+    var callingConvention: CallingConvention
+    
+    /// `arguments` is a Python tuple.
+    typealias VarArgsFunction = (
+        _ arguments: PythonObject) throws -> PythonConvertible
+    
+    /// `arguments` is a Python tuple.
+    /// `keywordArguments` is an OrderedDict in Python 3.6 and later, or a dict otherwise.
+    typealias VarArgsWithKeywordsFunction = (
+        _ arguments: PythonObject,
+        _ keywordArguments: PythonObject) throws -> PythonConvertible
+    
+    /// Has the same memory layout as any other function with the Swift calling convention
+    private typealias Storage = () throws -> PythonConvertible
+    
+    /// Stores all function pointers in the same stored property. `callAsFunction` casts this into the desired type.
+    private var callSwiftFunction: Storage
+  
+    init(_ callSwiftFunction: @escaping VarArgsFunction) {
+        self.callingConvention = .varArgs
+        self.callSwiftFunction = unsafeBitCast(callSwiftFunction, to: Storage.self)
+    }
+    
+    init(_ callSwiftFunction: @escaping VarArgsWithKeywordsFunction) {
+        self.callingConvention = .varArgsWithKeywords
+        self.callSwiftFunction = unsafeBitCast(callSwiftFunction, to: Storage.self)
+    }
+    
+    private func checkConvention(_ calledConvention: CallingConvention) {
+        precondition(callingConvention == calledConvention,
+            "Called PyFunction with convention \(calledConvention), but expected \(callingConvention)")
+    }
+  
     func callAsFunction(_ argumentsTuple: PythonObject) throws -> PythonConvertible {
-        try callSwiftFunction(argumentsTuple)
+        checkConvention(.varArgs)
+        let callSwiftFunction = unsafeBitCast(self.callSwiftFunction, to: VarArgsFunction.self)
+        return try callSwiftFunction(argumentsTuple)
+    }
+    
+    func callAsFunction(_ argumentsTuple: PythonObject, _ keywordArguments: PythonObject) throws -> PythonConvertible {
+        checkConvention(.varArgsWithKeywords)
+        let callSwiftFunction = unsafeBitCast(self.callSwiftFunction, to: VarArgsWithKeywordsFunction.self)
+        return try callSwiftFunction(argumentsTuple, keywordArguments)
     }
 }
 
 public struct PythonFunction {
     /// Called directly by the Python C API
     private var function: PyFunction
-
+    
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
         function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple[0])
         }
     }
-
-    /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead
+    
+    /// For cases where the Swift function should accept more (or less) than one parameter, accept an ordered array of all arguments instead.
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
         function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple.map { $0 })
+        }
+    }
+    
+    /// For cases where the Swift function should accept keyword arguments as `**kwargs` in Python.
+    /// `**kwargs` must preserve order from Python 3.6 onward, similarly to
+    /// Swift `KeyValuePairs` and unlike `Dictionary`. `KeyValuePairs` cannot be
+    /// mutated, so the next best solution is to use `[KeyValuePairs.Element]`.
+    public init(_ fn: @escaping ([PythonObject], [(key: String, value: PythonObject)]) throws -> PythonConvertible) {
+        function = PyFunction { argumentsAsTuple, keywordArgumentsAsDictionary in
+            var kwargs: [(String, PythonObject)] = []
+            for keyAndValue in keywordArgumentsAsDictionary.items() {
+                let (key, value) = keyAndValue.tuple2
+                kwargs.append((String(key)!, value))
+            }
+            return try fn(argumentsAsTuple.map { $0 }, kwargs)
         }
     }
 }
@@ -1581,14 +1662,26 @@ extension PythonFunction : PythonConvertible {
             fatalError("PythonFunction only supports Python 3.1 and above.")
         }
 
-        let funcPointer = Unmanaged.passRetained(function).toOpaque()
-        let capsulePointer = PyCapsule_New(funcPointer, nil, { capsulePointer in
+        let destructor: @convention(c) (PyObjectPointer?) -> Void = { capsulePointer in
             let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
             Unmanaged<PyFunction>.fromOpaque(funcPointer).release()
-        })
+        }
+        let funcPointer = Unmanaged.passRetained(function).toOpaque()
+        let capsulePointer = PyCapsule_New(
+            funcPointer,
+            nil,
+            unsafeBitCast(destructor, to: OpaquePointer.self)
+        )
 
+        var methodDefinition: UnsafeMutablePointer<PyMethodDef>
+        switch function.callingConvention {
+        case .varArgs:
+            methodDefinition = PythonFunction.sharedMethodDefinition
+        case .varArgsWithKeywords:
+            methodDefinition = PythonFunction.sharedMethodWithKeywordsDefinition
+        }
         let pyFuncPointer = PyCFunction_NewEx(
-            PythonFunction.sharedMethodDefinition,
+            methodDefinition,
             capsulePointer,
             nil
         )
@@ -1598,28 +1691,54 @@ extension PythonFunction : PythonConvertible {
 }
 
 fileprivate extension PythonFunction {
-    static let sharedFunctionName: UnsafePointer<Int8> = {
+    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
         let name: StaticString = "pythonkit_swift_function"
         // `utf8Start` is a property of StaticString, thus, it has a stable pointer.
-        return UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
-    }()
+        let namePointer = UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
 
-    static let sharedMethodDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        let methodImplementationPointer = unsafeBitCast(
+            PythonFunction.sharedMethodImplementation, to: OpaquePointer.self)
+
         /// The standard calling convention. See Python C API docs
-        let METH_VARARGS = 1 as Int32
+        let METH_VARARGS = 0x0001 as Int32
 
         let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
         pointer.pointee = PyMethodDef(
-            ml_name: PythonFunction.sharedFunctionName,
-            ml_meth: PythonFunction.sharedMethodImplementation,
+            ml_name: namePointer,
+            ml_meth: methodImplementationPointer,
             ml_flags: METH_VARARGS,
             ml_doc: nil
         )
 
         return pointer
     }()
+    
+    static let sharedMethodWithKeywordsDefinition: UnsafeMutablePointer<PyMethodDef> = {
+        let name: StaticString = "pythonkit_swift_function_with_keywords"
+        // `utf8Start` is a property of StaticString, thus, it has a stable pointer.
+        let namePointer = UnsafeRawPointer(name.utf8Start).assumingMemoryBound(to: Int8.self)
 
-    private static let sharedMethodImplementation: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer? = { context, argumentsPointer in
+        let methodImplementationPointer = unsafeBitCast(
+            PythonFunction.sharedMethodWithKeywordsImplementation, to: OpaquePointer.self)
+
+        /// A combination of flags that supports `**kwargs`. See Python C API docs
+        let METH_VARARGS = 0x0001 as Int32
+        let METH_KEYWORDS = 0x0002 as Int32
+
+        let pointer = UnsafeMutablePointer<PyMethodDef>.allocate(capacity: 1)
+        pointer.pointee = PyMethodDef(
+            ml_name: namePointer,
+            ml_meth: methodImplementationPointer,
+            ml_flags: METH_VARARGS | METH_KEYWORDS,
+            ml_doc: nil
+        )
+
+        return pointer
+    }()
+
+    private static let sharedMethodImplementation: @convention(c) (
+        PyObjectPointer?, PyObjectPointer?
+    ) -> PyObjectPointer? = { context, argumentsPointer in
         guard let argumentsPointer = argumentsPointer, let capsulePointer = context else {
             return nil
         }
@@ -1630,6 +1749,31 @@ fileprivate extension PythonFunction {
         do {
             let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
             return try function(argumentsAsTuple).ownedPyObject
+        } catch {
+            PythonFunction.setPythonError(swiftError: error)
+            return nil // This must only be `nil` if an exception has been set
+        }
+    }
+    
+    private static let sharedMethodWithKeywordsImplementation: @convention(c) (
+        PyObjectPointer?, PyObjectPointer?, PyObjectPointer?
+    ) -> PyObjectPointer? = { context, argumentsPointer, keywordArgumentsPointer in
+        guard let argumentsPointer = argumentsPointer, let capsulePointer = context else {
+            return nil
+        }
+
+        let funcPointer = PyCapsule_GetPointer(capsulePointer, nil)
+        let function = Unmanaged<PyFunction>.fromOpaque(funcPointer).takeUnretainedValue()
+
+        do {
+            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            var keywordArgumentsAsDictionary: PythonObject
+            if let keywordArgumentsPointer = keywordArgumentsPointer {
+                keywordArgumentsAsDictionary = PythonObject(consuming: keywordArgumentsPointer)
+            } else {
+                keywordArgumentsAsDictionary = [:]
+            }
+            return try function(argumentsAsTuple, keywordArgumentsAsDictionary).ownedPyObject
         } catch {
             PythonFunction.setPythonError(swiftError: error)
             return nil // This must only be `nil` if an exception has been set
@@ -1664,8 +1808,9 @@ struct PyMethodDef {
     /// The name of the built-in function/method
     var ml_name: UnsafePointer<Int8>
 
-    /// The C function that implements it
-    var ml_meth: @convention(c) (PyObjectPointer?, PyObjectPointer?) -> PyObjectPointer?
+    /// The C function that implements it.
+    /// Since this accepts multiple function signatures, the Swift type must be opaque here.
+    var ml_meth: OpaquePointer
 
     /// Combination of METH_xxx flags, which mostly describe the args expected by the C func
     var ml_flags: Int32
@@ -1686,6 +1831,10 @@ public struct PythonInstanceMethod {
     }
     
     public init(_ fn: @escaping ([PythonObject]) throws -> PythonConvertible) {
+        function = PythonFunction(fn)
+    }
+    
+    public init(_ fn: @escaping ([PythonObject], [(key: String, value: PythonObject)]) throws -> PythonConvertible) {
         function = PythonFunction(fn)
     }
 }
