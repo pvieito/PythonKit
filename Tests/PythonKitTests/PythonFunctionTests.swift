@@ -13,9 +13,9 @@ class PythonFunctionTests: XCTestCase {
             return
         }
         
-        let pythonAdd = PythonFunction { (params: [PythonObject]) in
-            let lhs = params[0]
-            let rhs = params[1]
+        let pythonAdd = PythonFunction { args in
+            let lhs = args[0]
+            let rhs = args[1]
             return lhs + rhs
         }.pythonObject
         
@@ -30,27 +30,25 @@ class PythonFunctionTests: XCTestCase {
             return
         }
         
-        let constructor = PythonInstanceMethod { (params: [PythonObject]) in
-            let `self` = params[0]
-            let arg = params[1]
-            `self`.constructor_arg = arg
+        let constructor = PythonInstanceMethod { args in
+            let `self` = args[0]
+            `self`.constructor_arg = args[1]
             return Python.None
         }
 
         // Instead of calling `print`, use this to test what would be output.
         var printOutput: String?
 
-        let displayMethod = PythonInstanceMethod { (params: [PythonObject]) in
-            // let `self` = params[0]
-            let arg = params[1]
-            printOutput = String(arg)
+        // Example of function using an alternative syntax for `args`.
+        let displayMethod = PythonInstanceMethod { (args: [PythonObject]) in
+            // let `self` = args[0]
+            printOutput = String(args[1])
             return Python.None
         }
 
-        let classMethodOriginal = PythonInstanceMethod { (params: [PythonObject]) in
-            // let cls = params[0]
-            let arg = params[1]
-            printOutput = String(arg)
+        let classMethodOriginal = PythonInstanceMethod { args in
+            // let cls = args[0]
+            printOutput = String(args[1])
             return Python.None
         }
 
@@ -121,9 +119,9 @@ class PythonFunctionTests: XCTestCase {
             members: [
                 "str_prefix": "HelloException-prefix ",
                 
-                "__init__": PythonInstanceMethod { (params: [PythonObject]) in
-                    let `self` = params[0]
-                    let message = "hello \(params[1])"
+                "__init__": PythonInstanceMethod { args in
+                    let `self` = args[0]
+                    let message = "hello \(args[1])"
                     helloOutput = String(message)
                     
                     // Conventional `super` syntax causes problems; use this instead.
@@ -131,6 +129,7 @@ class PythonFunctionTests: XCTestCase {
                     return Python.None
                 },
                 
+                // Example of function using the `self` convention instead of `args`.
                 "__str__": PythonInstanceMethod { (`self`: PythonObject) in
                     return `self`.str_prefix + Python.repr(`self`)
                 }
@@ -143,18 +142,19 @@ class PythonFunctionTests: XCTestCase {
             members: [
                 "str_prefix": "HelloWorldException-prefix ",
                 
-                "__init__": PythonInstanceMethod { (params: [PythonObject]) in
-                    let `self` = params[0]
-                    let message = "world \(params[1])"
+                "__init__": PythonInstanceMethod { args in
+                    let `self` = args[0]
+                    let message = "world \(args[1])"
                     helloWorldOutput = String(message)
                     
-                    `self`.int_param = params[2]
+                    `self`.int_param = args[2]
                     
                     // Conventional `super` syntax causes problems; use this instead.
                     HelloException.__init__(`self`, message)
                     return Python.None
                 },
                 
+                // Example of function using the `self` convention instead of `args`.
                 "custom_method": PythonInstanceMethod { (`self`: PythonObject) in
                     return `self`.int_param
                 }
@@ -178,7 +178,9 @@ class PythonFunctionTests: XCTestCase {
         
         // Test that subclasses behave like Python exceptions
 
-        let testFunction = PythonFunction { (_: [PythonObject]) in
+        // Example of function with no named parameters, which can be stated
+        // ergonomically using an underscore. The ignored input is a [PythonObject].
+        let testFunction = PythonFunction { _ in
             throw HelloWorldException("EXAMPLE ERROR MESSAGE", 2)
         }.pythonObject
         

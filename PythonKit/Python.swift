@@ -1558,6 +1558,7 @@ public struct PythonFunction {
     /// Called directly by the Python C API
     private var function: PyFunction
 
+    @_disfavoredOverload
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
         function = PyFunction { argumentsAsTuple in
             return try fn(argumentsAsTuple[0])
@@ -1681,6 +1682,7 @@ struct PyMethodDef {
 public struct PythonInstanceMethod {
     private var function: PythonFunction
     
+    @_disfavoredOverload
     public init(_ fn: @escaping (PythonObject) throws -> PythonConvertible) {
         function = PythonFunction(fn)
     }
