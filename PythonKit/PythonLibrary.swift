@@ -213,6 +213,12 @@ extension PythonLibrary {
         self.enforceNonLoadedPythonLibrary()
         PythonLibrary.Environment.library.set(path)
     }
+    
+    public static func checkLibrary() -> Bool {
+        let pythonLibraryHandleTest = Self.loadPythonLibrary()
+        return Self.isPythonLibraryLoaded(at: pythonLibraryHandleTest)
+    }
+    
 }
 
 // `PythonVersion` struct that defines a given Python version.
