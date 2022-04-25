@@ -13,12 +13,12 @@ class PythonFunctionTests: XCTestCase {
             return
         }
         
-        let pythonAdd = PythonFunction { (args: [PythonObject]) in
+        let pythonAdd = PythonFunction { args in
             let lhs = args[0]
             let rhs = args[1]
             return lhs + rhs
         }.pythonObject
-
+        
         let pythonSum = pythonAdd(2, 3)
         XCTAssertNotNil(Double(pythonSum))
         XCTAssertEqual(pythonSum, 5)
@@ -54,35 +54,33 @@ class PythonFunctionTests: XCTestCase {
             return
         }
         
-        let constructor = PythonInstanceMethod { (args: [PythonObject]) in
+        let constructor = PythonInstanceMethod { args in
             let `self` = args[0]
-            let arg = args[1]
-            `self`.constructor_arg = arg
+            `self`.constructor_arg = args[1]
             return Python.None
         }
-
+        
         // Instead of calling `print`, use this to test what would be output.
         var printOutput: String?
-
+        
+        // Example of function using an alternative syntax for `args`.
         let displayMethod = PythonInstanceMethod { (args: [PythonObject]) in
-            // let `self` = params[0]
-            let arg = args[1]
-            printOutput = String(arg)
+            // let `self` = args[0]
+            printOutput = String(args[1])
             return Python.None
         }
-
-        let classMethodOriginal = PythonInstanceMethod { (args: [PythonObject]) in
-            // let cls = params[0]
-            let arg = args[1]
-            printOutput = String(arg)
+        
+        let classMethodOriginal = PythonInstanceMethod { args in
+            // let cls = args[0]
+            printOutput = String(args[1])
             return Python.None
         }
-
+        
         // Did not explicitly convert `constructor` or `displayMethod` to
         // PythonObject. This is intentional, as the `PythonClass` initializer
         // should take any `PythonConvertible` and not just `PythonObject`.
         let classMethod = Python.classmethod(classMethodOriginal.pythonObject)
-
+        
         let Geeks = PythonClass("Geeks", members: [
             // Constructor
             "__init__": constructor,
@@ -100,10 +98,10 @@ class PythonFunctionTests: XCTestCase {
         XCTAssertEqual(obj.constructor_arg, "constructor argument")
         XCTAssertEqual(obj.string_attribute, "Geeks 4 geeks!")
         XCTAssertEqual(obj.int_attribute, 1706256)
-
+        
         obj.func_arg("Geeks for Geeks")
         XCTAssertEqual(printOutput, "Geeks for Geeks")
-
+        
         Geeks.class_func("Class Dynamically Created!")
         XCTAssertEqual(printOutput, "Class Dynamically Created!")
     }
@@ -136,16 +134,16 @@ class PythonFunctionTests: XCTestCase {
         
         var helloOutput: String?
         var helloWorldOutput: String?
-
+        
         // Declare subclasses of `Python.Exception`
-
+        
         let HelloException = PythonClass(
             "HelloException",
             superclasses: [Python.Exception],
             members: [
                 "str_prefix": "HelloException-prefix ",
                 
-                "__init__": PythonInstanceMethod { (args: [PythonObject]) in
+                "__init__": PythonInstanceMethod { args in
                     let `self` = args[0]
                     let message = "hello \(args[1])"
                     helloOutput = String(message)
@@ -155,6 +153,7 @@ class PythonFunctionTests: XCTestCase {
                     return Python.None
                 },
                 
+                // Example of function using the `self` convention instead of `args`.
                 "__str__": PythonInstanceMethod { (`self`: PythonObject) in
                     return `self`.str_prefix + Python.repr(`self`)
                 }
@@ -167,7 +166,7 @@ class PythonFunctionTests: XCTestCase {
             members: [
                 "str_prefix": "HelloWorldException-prefix ",
                 
-                "__init__": PythonInstanceMethod { (args: [PythonObject]) in
+                "__init__": PythonInstanceMethod { args in
                     let `self` = args[0]
                     let message = "world \(args[1])"
                     helloWorldOutput = String(message)
@@ -179,6 +178,7 @@ class PythonFunctionTests: XCTestCase {
                     return Python.None
                 },
                 
+                // Example of function using the `self` convention instead of `args`.
                 "custom_method": PythonInstanceMethod { (`self`: PythonObject) in
                     return `self`.int_param
                 }
@@ -186,7 +186,7 @@ class PythonFunctionTests: XCTestCase {
         ).pythonObject
         
         // Test that inheritance works as expected
-
+        
         let error1 = HelloException("test 1")
         XCTAssertEqual(helloOutput, "hello test 1")
         XCTAssertEqual(Python.str(error1), "HelloException-prefix HelloException('hello test 1')")
@@ -201,8 +201,10 @@ class PythonFunctionTests: XCTestCase {
         XCTAssertNotEqual(error2.custom_method(), "123")
         
         // Test that subclasses behave like Python exceptions
-
-        let testFunction = PythonFunction { (_: [PythonObject]) in
+        
+        // Example of function with no named parameters, which can be stated
+        // ergonomically using an underscore. The ignored input is a [PythonObject].
+        let testFunction = PythonFunction { _ in
             throw HelloWorldException("EXAMPLE ERROR MESSAGE", 2)
         }.pythonObject
         
