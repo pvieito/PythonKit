@@ -1,10 +1,9 @@
+
 #  PythonKit
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpvieito%2FPythonKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pvieito/PythonKit)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpvieito%2FPythonKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pvieito/PythonKit)
 
 Swift framework to interact with Python.
-
-## Requirements
-
-**PythonKit** requires [**Swift 5**](https://swift.org/download/) or higher and has been tested on macOS, Linux and Windows.
 
 ## Usage
 
