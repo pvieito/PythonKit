@@ -214,7 +214,7 @@ extension PythonLibrary {
         PythonLibrary.Environment.library.set(path)
     }
     
-    public static func checkLibrary() -> Bool {
+    public static func libraryExists() -> Bool {
         let pythonLibraryHandleTest = Self.loadPythonLibrary()
         return Self.isPythonLibraryLoaded(at: pythonLibraryHandleTest)
     }
