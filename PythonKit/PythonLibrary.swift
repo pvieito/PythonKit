@@ -223,32 +223,43 @@ extension PythonLibrary {
             """)
     }
     
-    public static func useVersion(_ major: Int, _ minor: Int? = nil) {
+    /// Use the Python library with the specified version.
+    /// - Parameters:
+    ///   - major: Major version or nil to use any Python version.
+    ///   - minor: Minor version or nil to use any minor version.
+    public static func useVersion(_ major: Int?, _ minor: Int? = nil) {
         self.enforceNonLoadedPythonLibrary()
         let version = PythonVersion(major: major, minor: minor)
         PythonLibrary.Environment.version.set(version.versionString)
     }
     
-    public static func useLibrary(at path: String) {
+    /// Use the Python library at the specified path.
+    /// - Parameter path: Path of the Python library to load or nil to use the default search path.
+    public static func useLibrary(at path: String?) {
         self.enforceNonLoadedPythonLibrary()
-        PythonLibrary.Environment.library.set(path)
+        PythonLibrary.Environment.library.set(path ?? "")
     }
 }
 
 // `PythonVersion` struct that defines a given Python version.
 extension PythonLibrary {
     private struct PythonVersion {
-        let major: Int
+        let major: Int?
         let minor: Int?
         
         static let versionSeparator: Character = "."
         
-        init(major: Int, minor: Int?) {
+        init(major: Int?, minor: Int?) {
+            precondition(!(major == nil && minor != nil), """
+                Error: The Python library minor version cannot be specified \
+                without the major version.
+                """)
             self.major = major
             self.minor = minor
         }
         
         var versionString: String {
+            guard let major = major else { return "" }
             var versionString = String(major)
             if let minor = minor {
                 versionString += "\(PythonVersion.versionSeparator)\(minor)"
@@ -273,8 +284,10 @@ extension PythonLibrary {
         }
         
         var value: String? {
-            guard let value = getenv(key) else { return nil }
-            return String(cString: value)
+            guard let cString = getenv(key) else { return nil }
+            let value = String(cString: cString)
+            guard !value.isEmpty else { return nil }
+            return value
         }
         
         func set(_ value: String) {
