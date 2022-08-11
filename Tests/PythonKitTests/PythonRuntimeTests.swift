@@ -34,7 +34,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(2, Python.len(dict))
         XCTAssertEqual(1, dict["a"])
         XCTAssertEqual(0.5, dict[1])
-      
+        
         XCTAssertEqual(2, dict.count as Int)
         XCTAssertEqual(2, dict.checking.count!)
         XCTAssertEqual(2, dict.throwing.count!)
@@ -43,6 +43,27 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual("c", dict["b"])
         dict["b"] = "d"
         XCTAssertEqual("d", dict["b"])
+
+        // Pandas DataFrame regression test spotted in Jupyter. This is
+        // non-deterministic, so repeat it several times to ensure the bug does
+        // not appear.
+        for _ in 0..<15 {
+            let records: [PythonObject] = [
+                ["col 1": 3, "col 2": 5],
+                ["col 1": 8, "col 2": 2]
+            ]
+            let records_description =
+                "[{'col 1': 3, 'col 2': 5}, {'col 1': 8, 'col 2': 2}]"
+            XCTAssertEqual(String(describing: records), records_description)
+            
+            let records_alt: [PythonObject] = [
+                ["col 1": 3, "col 2": 5, "col 3": 4],
+                ["col 1": 8, "col 2": 2, "col 3": 4]
+            ]
+            let records_alt_description =
+                "[{'col 1': 3, 'col 2': 5, 'col 3': 4}, {'col 1': 8, 'col 2': 2, 'col 3': 4}]"
+            XCTAssertEqual(String(describing: records_alt), records_alt_description)
+        }
     }
     
     func testRange() {
@@ -123,12 +144,12 @@ class PythonRuntimeTests: XCTestCase {
     }
 
     func testUnaryOps() {
-	var x = PythonObject(5)
-	x = -x
-	XCTAssertEqual(-5, x)
-	x = PythonObject(-5)
-	x = -x
-	XCTAssertEqual(5, x)
+        var x = PythonObject(5)
+        x = -x
+        XCTAssertEqual(-5, x)
+        x = PythonObject(-5)
+        x = -x
+        XCTAssertEqual(5, x)
     }
 
     func testComparable() {
