@@ -44,6 +44,12 @@ class PythonRuntimeTests: XCTestCase {
         dict["b"] = "d"
         XCTAssertEqual("d", dict["b"])
 
+        // Dictionary initializer patch does not work on Python 2, but that
+        // version is no longer being actively supported.
+        guard Python.versionInfo.major >= 3 else {
+            return
+        }
+
         // Pandas DataFrame regression test spotted in Jupyter. This is
         // non-deterministic, so repeat it several times to ensure the bug does
         // not appear.
