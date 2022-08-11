@@ -93,6 +93,10 @@ let PyErr_Fetch: @convention(c) (
 let PyDict_New: @convention(c) () -> PyObjectPointer? =
     PythonLibrary.loadSymbol(name: "PyDict_New")
 
+let PyDict_Contains: @convention(c) (
+    PyObjectPointer?, PyObjectPointer?) -> Int32 =
+    PythonLibrary.loadSymbol(name: "PyDict_Contains")
+
 let PyDict_SetItem: @convention(c) (
     PyObjectPointer?, PyObjectPointer, PyObjectPointer) -> Void =
     PythonLibrary.loadSymbol(name: "PyDict_SetItem")
