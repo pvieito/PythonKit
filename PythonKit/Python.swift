@@ -722,7 +722,6 @@ public struct PythonInterface {
         return self.import("sys").version_info
     }
     
-    #if !os(Windows)
     /// Emulates a Python `with` statement.
     /// - Parameter object: A context manager object.
     /// - Parameter body: A closure to call on the result of `object.__enter__()`.
@@ -731,7 +730,6 @@ public struct PythonInterface {
         try body(yieldValue)
         yieldValue.__exit__()
     }
-    #endif
 }
 
 //===----------------------------------------------------------------------===//
