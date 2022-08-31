@@ -335,6 +335,7 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertEqual(bytes, otherBytes)
     }
     
+    #if !os(Windows)
     /// Tests an emulation of the Python `with` statement.
     ///
     /// Mirrors:
@@ -353,4 +354,5 @@ class PythonRuntimeTests: XCTestCase {
             XCTAssertEqual("Contents", String(contents)!)
         }
     }
+    #endif
 }
