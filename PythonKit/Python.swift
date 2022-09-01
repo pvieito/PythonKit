@@ -1274,8 +1274,8 @@ extension PythonObject : SignedNumeric {
         return self < 0 ? -self : self
     }
 
-    //override the default implementation of - prefix function
-    //from SignedNumeric  (https://bugs.swift.org/browse/SR-13293)
+    // Override the default implementation of `-` prefix function
+    // from SignedNumeric (https://bugs.swift.org/browse/SR-13293).
     public static prefix func - (_ operand: Self) -> Self {
         return performUnaryOp(PyNumber_Negative, operand: operand)
     }
@@ -1472,8 +1472,36 @@ extension PythonObject : ExpressibleByArrayLiteral, ExpressibleByDictionaryLiter
     }
     public typealias Key = PythonObject
     public typealias Value = PythonObject
+
+    // Preserves element order in the final Python object, unlike
+    // `Dictionary.pythonObject`. When keys are duplicated, throw the same
+    // runtime error as `Swift.Dictionary.init(dictionaryLiteral:)`. This
+    // differs from Python's key uniquing semantics, which silently override an
+    // existing key with the next one it encounters.
     public init(dictionaryLiteral elements: (PythonObject, PythonObject)...) {
-        self.init(Dictionary(elements, uniquingKeysWith: { lhs, _ in lhs }))
+        _ = Python // Ensure Python is initialized.
+        let dict = PyDict_New()!
+        for (key, value) in elements {
+            let k = key.ownedPyObject
+            let v = value.ownedPyObject
+
+            // Use Python's native key checking instead of querying whether
+            // `elements` contains the key. Although this could theoretically
+            // produce different results, it produces the Python object we want.
+            switch PyDict_Contains(dict, k) {
+            case 0:
+                PyDict_SetItem(dict, k, v)
+            case 1:
+                fatalError("Dictionary literal contains duplicate keys")
+            default:
+                try! throwPythonErrorIfPresent()
+                fatalError("No result or error checking whether \(elements) contains \(key)")
+            }
+
+            Py_DecRef(k)
+            Py_DecRef(v)
+        }
+        self.init(consuming: dict)
     }
 }
 
@@ -1876,7 +1904,9 @@ public struct PythonClass {
                 (key, value.pythonObject)
             }
             
-            dictionary = Dictionary(castedElements, uniquingKeysWith: { lhs, _ in lhs })
+            dictionary = Dictionary(castedElements, uniquingKeysWith: { _, _ in
+                fatalError("Dictionary literal contains duplicate keys")
+            })
         }
     }
 
