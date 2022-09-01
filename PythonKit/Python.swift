@@ -721,6 +721,15 @@ public struct PythonInterface {
     public var versionInfo: PythonObject {
         return self.import("sys").version_info
     }
+    
+    /// Emulates a Python `with` statement.
+    /// - Parameter object: A context manager object.
+    /// - Parameter body: A closure to call on the result of `object.__enter__()`.
+    public func with(_ object: PythonObject, _ body: (PythonObject) throws -> Void) rethrows {
+        let yieldValue = object.__enter__()
+        try body(yieldValue)
+        yieldValue.__exit__()
+    }
 }
 
 //===----------------------------------------------------------------------===//

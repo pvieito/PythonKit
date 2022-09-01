@@ -334,4 +334,23 @@ class PythonRuntimeTests: XCTestCase {
         }
         XCTAssertEqual(bytes, otherBytes)
     }
+    
+    /// Tests an emulation of the Python `with` statement.
+    ///
+    /// Mirrors:
+    /// ```python
+    /// with open('temp', 'w') as opened_file:
+    ///      opened_file.write('Contents')
+    /// with open('temp', 'r') as opened_file:
+    ///      contents = opened_file.read()
+    /// ```
+    func testWith() {
+        Python.with(Python.open("temp", "w")) { opened_file in
+            opened_file.write("Contents")
+        }
+        Python.with(Python.open("temp", "r")) { opened_file in
+            let contents = opened_file.read()
+            XCTAssertEqual("Contents", String(contents)!)
+        }
+    }
 }
