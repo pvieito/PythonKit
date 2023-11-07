@@ -137,7 +137,7 @@ where Element : NumpyScalarCompatible {
         self.init(repeating: dummyPointer.move(), count: scalarCount)
         dummyPointer.deallocate()
         withUnsafeMutableBufferPointer { buffPtr in
-            buffPtr.baseAddress!.update(from: ptr, count: scalarCount)
+            buffPtr.baseAddress!.assign(from: ptr, count: scalarCount)
         }
     }
 }
