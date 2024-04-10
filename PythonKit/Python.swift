@@ -683,14 +683,15 @@ public struct PythonInterface {
             import sys
             import os
             
-            # Some Python modules expect to have at least one argument in `sys.argv`.
+            # Some Python modules expect to have at least one argument in `sys.argv`:
             sys.argv = [""]
 
             # Some Python modules require `sys.executable` to return the path
             # to the Python interpreter executable. In Darwin, Python 3 returns the
-            # main process executable path instead.
+            # main process executable path instead:
             if sys.version_info.major == 3 and sys.platform == "darwin":
-                sys.executable = os.path.join(sys.exec_prefix, "bin", "python3")
+                executable_name = "python{}.{}".format(sys.version_info.major, sys.version_info.minor)
+                sys.executable = os.path.join(sys.exec_prefix, "bin", executable_name)
             """)
     }
     
