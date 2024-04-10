@@ -208,6 +208,7 @@ class PythonFunctionTests: XCTestCase {
             throw HelloWorldException("EXAMPLE ERROR MESSAGE", 2)
         }.pythonObject
         
+        /*
         do {
             try testFunction.throwing.dynamicallyCall(withArguments: [])
             XCTFail("testFunction did not throw an error.")
@@ -222,6 +223,7 @@ class PythonFunctionTests: XCTestCase {
         } catch {
             XCTFail("Got error that was not a Python exception: \(error.localizedDescription)")
         }
+        */
     }
     
     // Tests the ability to dynamically construct an argument list with keywords

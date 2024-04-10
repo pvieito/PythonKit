@@ -190,11 +190,11 @@ class PythonRuntimeTests: XCTestCase {
         XCTAssertThrowsError(
             try PythonObject(1).__truediv__.throwing.dynamicallyCall(withArguments: 0)
         ) {
-            guard let pythonError = $0 as? PythonError else {
+            guard case let PythonError.exception(exception, _) = $0 else {
                 XCTFail("non-Python error: \($0)")
                 return
             }
-            XCTAssertEqual(pythonError, PythonError.exception("division by zero", traceback: nil))
+            XCTAssertEqual(exception.__class__.__name__, "ZeroDivisionError")
         }
     }
     
