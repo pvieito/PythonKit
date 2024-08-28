@@ -204,7 +204,7 @@ class PythonFunctionTests: XCTestCase {
 
         // Example of function with no named parameters, which can be stated
         // ergonomically using an underscore. The ignored input is a [PythonObject].
-        let testFunction = PythonFunction { _ in
+        let _ = PythonFunction { _ in
             throw HelloWorldException("EXAMPLE ERROR MESSAGE", 2)
         }.pythonObject
 
