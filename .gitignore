@@ -15,6 +15,7 @@
 # Temporary Items
 *.tmp
 *.tmp.*
+temp
 
 # Virtual Environments
 /venv*/
