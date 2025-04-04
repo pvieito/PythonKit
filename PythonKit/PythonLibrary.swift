@@ -205,6 +205,13 @@ extension PythonLibrary {
         // Must be RTLD_GLOBAL because subsequent .so files from the imported python
         // modules may depend on this .so file.
         let pythonLibraryHandle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL)
+        if pythonLibraryHandle == nil {
+            self.log("Failed to load library at '\(path)'.")
+            if let errorCString = dlerror() {
+                let errorString = String(cString: errorCString)
+                self.log("Reason for failure: \(errorString)")
+            }
+        }
 #endif
 
         if pythonLibraryHandle != nil {
