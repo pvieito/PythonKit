@@ -1,0 +1,75 @@
+body {
+    font-family: 'Kantumruy Pro', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 15px;
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+.month-selector {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+.month-selector select, .month-selector input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.summary {
+    text-align: center;
+    background-color: #eaf2f8;
+    border-left: 5px solid #3498db;
+    padding: 10px;
+}
+#calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+.day-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 15px;
+}
+.day-card h4 {
+    margin: 0 0 10px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    padding: 8px;
+}
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.input-group label {
+    font-weight: 500;
+}
+.input-group input {
+    width: 60px;
+    padding: 5px;
+    text-align: right;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.day-results {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #ccc;
+    font-size: 14px;
+    color: #007bff;
+}
