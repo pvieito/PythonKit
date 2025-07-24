@@ -1,0 +1,139 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const monthSelect = document.getElementById('month');
+    const yearInput = document.getElementById('year');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const summaryTonnesEl = document.getElementById('summary-tonnes');
+    const summaryFinalEl = document.getElementById('summary-final');
+
+    let salesData = JSON.parse(localStorage.getItem('salesData')) || {};
+
+    // --- Core Functions ---
+
+    function renderCalendar() {
+        calendarGrid.innerHTML = ''; // Clear previous grid
+        const year = parseInt(yearInput.value);
+        const month = parseInt(monthSelect.value);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+        if (!salesData[monthKey]) {
+            salesData[monthKey] = {};
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayCard = document.createElement('div');
+            dayCard.className = 'day-card';
+            dayCard.setAttribute('data-day', day);
+
+            const dayData = salesData[monthKey][day] || { kg20: 0, kg25: 0, kg30: 0 };
+
+            dayCard.innerHTML = `
+                <h4>ថ្ងៃទី ${day}</h4>
+                <div class="input-group">
+                    <label>ប្រភេទ 20kg (បេ):</label>
+                    <input type="number" min="0" value="${dayData.kg20}" data-type="kg20">
+                </div>
+                <div class="input-group">
+                    <label>ប្រភេទ 25kg (បេ):</label>
+                    <input type="number" min="0" value="${dayData.kg25}" data-type="kg25">
+                </div>
+                <div class="input-group">
+                    <label>ប្រភេទ 30kg (បេ):</label>
+                    <input type="number" min="0" value="${dayData.kg30}" data-type="kg30">
+                </div>
+                <div class="day-results">
+                    <p>ទម្ងន់: <span class="tonnes">0.000</span> តោន</p>
+                    <p>លទ្ធផល: <span class="final-value">0.00</span></p>
+                </div>
+            `;
+            calendarGrid.appendChild(dayCard);
+            calculateDay(day); // Calculate for existing data
+        }
+        updateMonthlySummary();
+    }
+
+    function calculateDay(day) {
+        const dayCard = document.querySelector(`.day-card[data-day='${day}']`);
+        if (!dayCard) return;
+
+        const sacks20 = parseInt(dayCard.querySelector('[data-type="kg20"]').value) || 0;
+        const sacks25 = parseInt(dayCard.querySelector('[data-type="kg25"]').value) || 0;
+        const sacks30 = parseInt(dayCard.querySelector('[data-type="kg30"]').value) || 0;
+
+        const totalWeightKg = (sacks20 * 20) + (sacks25 * 25) + (sacks30 * 30);
+        const totalTonnes = totalWeightKg / 1000;
+        const finalValue = totalTonnes * 0.07;
+
+        dayCard.querySelector('.tonnes').textContent = totalTonnes.toFixed(3);
+        dayCard.querySelector('.final-value').textContent = finalValue.toFixed(2);
+    }
+    
+    function updateMonthlySummary() {
+        const monthKey = `${yearInput.value}-${String(parseInt(monthSelect.value) + 1).padStart(2, '0')}`;
+        const monthData = salesData[monthKey] || {};
+        
+        let totalMonthTonnes = 0;
+        let totalMonthFinalValue = 0;
+
+        for (const day in monthData) {
+            const dayData = monthData[day];
+            const totalWeightKg = (dayData.kg20 * 20) + (dayData.kg25 * 25) + (dayData.kg30 * 30);
+            const totalTonnes = totalWeightKg / 1000;
+            const finalValue = totalTonnes * 0.07;
+            
+            totalMonthTonnes += totalTonnes;
+            totalMonthFinalValue += finalValue;
+        }
+        
+        summaryTonnesEl.textContent = totalMonthTonnes.toFixed(3);
+        summaryFinalEl.textContent = totalMonthFinalValue.toFixed(2);
+    }
+
+    function handleInput(e) {
+        if (e.target.tagName !== 'INPUT') return;
+
+        const dayCard = e.target.closest('.day-card');
+        const day = parseInt(dayCard.getAttribute('data-day'));
+        const type = e.target.getAttribute('data-type');
+        const value = parseInt(e.target.value) || 0;
+
+        // Save data
+        const monthKey = `${yearInput.value}-${String(parseInt(monthSelect.value) + 1).padStart(2, '0')}`;
+        if (!salesData[monthKey][day]) {
+            salesData[monthKey][day] = { kg20: 0, kg25: 0, kg30: 0 };
+        }
+        salesData[monthKey][day][type] = value;
+        localStorage.setItem('salesData', JSON.stringify(salesData));
+
+        // Recalculate and update UI
+        calculateDay(day);
+        updateMonthlySummary();
+    }
+
+    // --- Initialization ---
+    function init() {
+        // Populate month dropdown
+        const months = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+        months.forEach((month, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = month;
+            monthSelect.appendChild(option);
+        });
+
+        // Set current month and year
+        const now = new Date();
+        monthSelect.value = now.getMonth();
+        yearInput.value = now.getFullYear();
+
+        renderCalendar();
+
+        // Event Listeners
+        monthSelect.addEventListener('change', renderCalendar);
+        yearInput.addEventListener('change', renderCalendar);
+        calendarGrid.addEventListener('input', handleInput);
+    }
+
+    init();
+});
