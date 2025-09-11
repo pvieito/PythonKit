@@ -26,4 +26,4 @@ This file provides development guidelines for AI agents working with this Swift 
 
 ---
 
-**IMPORTANT**: This is a generic development guide for AI agents shared and available on multiple projects, so avoid adding project-specific information here. Refer to README.md and the source code for project-specific details.
+**IMPORTANT**: This is a generic development guide for AI agents shared and available on multiple projects, so avoid adding project-specific information here. Refer to `README.md` file if available and the source code for project-specific details.
