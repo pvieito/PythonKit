@@ -17,7 +17,7 @@ This file provides development guidelines for AI agents working with this Swift 
 - **ProcessInfo**: `launchExtensionsPaneInSystemSettings()`, `launchPrivacyAndSecurityPaneInSystemSettings()`.
 - **URL**: `open(withAppBundleIdentifier:)` for cross-platform URL opening.
 - **Process**: Enhanced execution utilities with output capture.
-- **UserDefaults**: `@UserDefaults.Wrapper` property wrapper for cleaner app preferences.
+- **UserDefaults**: `@UserDefaults.Wrapper` property wrapper for cleaner app settings.
 
 ### Building and Testing
 
