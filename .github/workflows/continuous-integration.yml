@@ -14,12 +14,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          python-version: '3.13'
+      - name: Configure PythonKit
+        shell: bash
+        run: |
+          python_library="$(find "$pythonLocation" \( -name 'libpython3.13*.dylib' -o -name 'libpython3.13*.so' \) -print -quit)"
+          test -n "$python_library"
+          echo "PYTHON_LIBRARY=$python_library" >> "$GITHUB_ENV"
       - name: Test
         run: swift test --enable-test-discovery
         if: runner.os != 'Windows'
         env:
-          PYTHON_VERSION: 3
           PYTHON_LOADER_LOGGING: TRUE
