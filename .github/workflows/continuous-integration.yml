@@ -20,7 +20,7 @@ jobs:
       - name: Configure PythonKit
         shell: bash
         run: |
-          python_library="$(find "$pythonLocation" \( -name 'libpython3.13*.dylib' -o -name 'libpython3.13*.so' \) -print -quit)"
+          python_library="$(find -L "$pythonLocation" \( -name 'libpython3.13*.dylib' -o -name 'libpython3.13*.so' \) -print -quit)"
           test -n "$python_library"
           echo "PYTHON_LIBRARY=$python_library" >> "$GITHUB_ENV"
       - name: Test
