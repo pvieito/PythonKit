@@ -10,6 +10,10 @@ on:
 
 jobs:
   continuous-integration:
+    if: >
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      !contains(github.event.head_commit.message || '', '[SKIP-CI]') &&
+      !contains(github.event.pull_request.title || '', '[SKIP-CI]')
     strategy:
       matrix:
         os:
