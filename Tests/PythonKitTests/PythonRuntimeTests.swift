@@ -198,6 +198,19 @@ class PythonRuntimeTests: XCTestCase {
         }
     }
 
+    func testThrowingCallableWrapper() throws {
+        let intCtor = Python.int
+        XCTAssertEqual(try intCtor.throwingCallable("2"), 2)
+
+        XCTAssertThrowsError(try intCtor.throwingCallable("abc")) { error in
+            guard case let PythonError.exception(exception, _) = error else {
+                XCTFail("non-Python error: \(error)")
+                return
+            }
+            XCTAssertEqual(exception.__class__.__name__, "ValueError")
+        }
+    }
+
     #if !os(Windows)
     func testTuple() {
         let element1: PythonObject = 0
