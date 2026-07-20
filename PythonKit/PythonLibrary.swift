@@ -291,7 +291,17 @@ extension PythonLibrary {
         }
 
         var value: String? {
+#if os(Windows)
+            var cString: UnsafeMutablePointer<CChar>? = nil
+            var size: size_t = 0
+            let result = _dupenv_s(&cString, &size, key)
+            defer {
+                if let cString { free(cString) }
+            }
+            guard result == 0, let cString else { return nil }
+#else
             guard let cString = getenv(key) else { return nil }
+#endif
             let value = String(cString: cString)
             guard !value.isEmpty else { return nil }
             return value
