@@ -1,5 +1,5 @@
 
-#  PythonKit
+# PythonKit
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpvieito%2FPythonKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pvieito/PythonKit)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpvieito%2FPythonKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pvieito/PythonKit)
 
@@ -39,7 +39,7 @@ Add the following dependency to your `Package.swift` manifest:
 
 ## Environment Variables
 
-As the Python library are loaded at runtime by **PythonKit**, it will try to find the most modern Python version available in the system. You can force a given version with the `PYTHON_VERSION` environment variable or an specific Python library path or name with `PYTHON_LIBRARY`.
+As Python libraries are loaded at runtime by **PythonKit**, it will try to find the most modern Python version available in the system. You can force a given version with the `PYTHON_VERSION` environment variable or a specific Python library path or name with `PYTHON_LIBRARY`.
 
 ```
 $ PYTHON_VERSION=3 swift run
@@ -64,7 +64,7 @@ Fatal error: Python library not found. Set the PYTHON_LIBRARY environment variab
 
 ## Troubleshooting
 
-- If your are targeting the Mac platform with the [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime) enabled make sure you are properly signing and embedding the Python framework you are trying to load with **PythonKit**. The Hardened Runtime [Library Validation mechanism](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_cs_disable-library-validation) prevents a process from loading libraries that are not signed by Apple or the same developer as the main process.
+- If you are targeting the Mac platform with the [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime) enabled, make sure you are properly signing and embedding the Python framework you are trying to load with **PythonKit**. The Hardened Runtime [Library Validation mechanism](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_cs_disable-library-validation) prevents a process from loading libraries that are not signed by Apple or the same developer as the main process.
 
 
 ## Notes
