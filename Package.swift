@@ -1,9 +1,12 @@
-// swift-tools-version:5.1
+// swift-tools-version:6.2
 
 import PackageDescription
 
 let package = Package(
     name: "PythonKit",
+    platforms: [
+        .macOS(.v26),
+    ],
     products: [
         .library(
             name: "PythonKit",
@@ -17,7 +20,10 @@ let package = Package(
         ),
         .testTarget(
             name: "PythonKitTests",
-            dependencies: ["PythonKit"]
+            dependencies: [
+                "PythonKit",
+            ]
         ),
-    ]
+    ],
+    swiftLanguageModes: [.v5]
 )
