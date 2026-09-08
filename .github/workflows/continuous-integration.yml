@@ -17,10 +17,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-24.04
-          - os: macos-26
+          - os: ubuntu-latest
+          - os: macos-latest
             xcode: "26.0.1"
-          - os: macos-26
+          - os: macos-latest
             xcode: latest-stable
     runs-on: ${{ matrix.os }}
     steps:
