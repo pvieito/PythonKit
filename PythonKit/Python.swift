@@ -204,6 +204,24 @@ public extension PythonObject {
     var throwing: ThrowingPythonObject {
         return ThrowingPythonObject(self)
     }
+
+    /// Returns a dynamic-callable wrapper that surfaces Python exceptions as
+    /// Swift errors instead of trapping.
+    ///
+    /// This keeps the existing `PythonObject` call behavior unchanged while
+    /// offering an opt-in path to handle errors via `try`/`catch`.
+    var throwingCallable: ThrowingDynamicCallable {
+        return ThrowingDynamicCallable(self)
+    }
+
+    /// Returns a dynamic-callable wrapper that catches Python exceptions and
+    /// returns `Python.None` instead of crashing.
+    ///
+    /// This keeps the existing `PythonObject` call behavior unchanged while
+    /// offering an opt-in path to safely handle errors without throwing.
+    var safeCallable: SafeDynamicCallable {
+        return SafeDynamicCallable(self)
+    }
 }
 
 /// An error produced by a failable Python operation.
@@ -412,6 +430,88 @@ public struct ThrowingPythonObject {
 
     public var count: Int? {
         base.checking.count
+    }
+}
+
+/// A dynamic-callable wrapper around `PythonObject` that throws instead of
+/// trapping when a Python exception is raised.
+@dynamicCallable
+public struct ThrowingDynamicCallable {
+    private var base: PythonObject
+
+    fileprivate init(_ base: PythonObject) {
+        self.base = base
+    }
+
+    /// Call `base` with the specified positional arguments.
+    /// - Precondition: `base` must be a Python callable.
+    /// - Parameter args: Positional arguments for the Python callable.
+    @discardableResult
+    public func dynamicallyCall(
+        withArguments args: [PythonConvertible] = []) throws -> PythonObject {
+        return try base.throwing.dynamicallyCall(withArguments: args)
+    }
+
+    /// Call `base` with the specified arguments.
+    /// - Precondition: `base` must be a Python callable.
+    /// - Parameter args: Positional or keyword arguments for the Python callable.
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        KeyValuePairs<String, PythonConvertible> = [:]) throws -> PythonObject {
+        return try base.throwing.dynamicallyCall(withKeywordArguments: args)
+    }
+
+    /// Alias for the function above that lets the caller dynamically construct the argument list without using a dictionary literal.
+    /// This must be called explicitly because `@dynamicCallable` does not recognize it on `PythonObject`.
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        [(key: String, value: PythonConvertible)] = []) throws -> PythonObject {
+        return try base.throwing.dynamicallyCall(withKeywordArguments: args)
+    }
+}
+
+/// A dynamic-callable wrapper around `PythonObject` that catches Python
+/// exceptions and returns `Python.None` instead of crashing.
+@dynamicCallable
+public struct SafeDynamicCallable {
+    private var base: PythonObject
+
+    fileprivate init(_ base: PythonObject) {
+        self.base = base
+    }
+
+    @discardableResult
+    public func dynamicallyCall(
+        withArguments args: [PythonConvertible] = []) -> PythonObject {
+        do {
+            return try base.throwing.dynamicallyCall(withArguments: args)
+        } catch {
+            return Python.None
+        }
+    }
+
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        KeyValuePairs<String, PythonConvertible> = [:]) -> PythonObject {
+        do {
+            return try base.throwing.dynamicallyCall(withKeywordArguments: args)
+        } catch {
+            return Python.None
+        }
+    }
+
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        [(key: String, value: PythonConvertible)] = []) -> PythonObject {
+        do {
+            return try base.throwing.dynamicallyCall(withKeywordArguments: args)
+        } catch {
+            return Python.None
+        }
     }
 }
 
