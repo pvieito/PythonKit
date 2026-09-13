@@ -276,6 +276,100 @@ public struct ThrowingPythonObject {
         self.base = base
     }
 
+    /// Resolves a Python awaitable using a dedicated event loop.
+    ///
+    /// Synchronous Python callables are returned unchanged so the async
+    /// overload can be used with callables whose implementation is selected
+    /// dynamically.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    fileprivate func awaitResult(_ result: PythonObject) async throws -> PythonObject {
+        let gstate = PyGILState_Ensure()
+        defer {
+            PyGILState_Release(gstate)
+        }
+
+        let inspect = Python.import("inspect")
+        let isAwaitable = try inspect.isawaitable.throwing.callSynchronously(
+            withArguments: [result])
+        guard Bool(isAwaitable) == true else {
+            return result
+        }
+
+        let asyncio = Python.import("asyncio")
+        if let runnerClass = asyncio.checking.Runner {
+            let runner = try runnerClass.throwing.callSynchronously(
+                withArguments: [] as [PythonConvertible])
+            defer {
+                _ = try? runner.close.throwing.callSynchronously(
+                    withArguments: [])
+            }
+            return try runner.run.throwing.callSynchronously(
+                withArguments: [result])
+        }
+
+        let eventLoop = try asyncio.new_event_loop.throwing.callSynchronously(
+            withArguments: [] as [PythonConvertible])
+        _ = try? asyncio.set_event_loop.throwing.callSynchronously(
+            withArguments: [eventLoop])
+        defer {
+            _ = try? eventLoop.close.throwing.callSynchronously(
+                withArguments: [])
+            _ = try? asyncio.set_event_loop.throwing.callSynchronously(
+                withArguments: [Python.None])
+        }
+        return try eventLoop.run_until_complete.throwing.callSynchronously(
+            withArguments: [result])
+    }
+
+    /// Asynchronously calls `self` with the specified positional arguments.
+    ///
+    /// If the call returns a Python awaitable, it is resolved before the
+    /// result is returned. Synchronous callables are also supported.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @discardableResult
+    public func dynamicallyCall(
+        withArguments args: PythonConvertible...) async throws -> PythonObject {
+        return try await awaitResult(
+            callSynchronously(withArguments: args))
+    }
+
+    /// Asynchronously calls `self` with the specified positional arguments.
+    ///
+    /// If the call returns a Python awaitable, it is resolved before the
+    /// result is returned. Synchronous callables are also supported.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @discardableResult
+    public func dynamicallyCall(
+        withArguments args: [PythonConvertible]) async throws -> PythonObject {
+        return try await awaitResult(
+            callSynchronously(withArguments: args))
+    }
+
+    /// Asynchronously calls `self` with the specified positional and keyword
+    /// arguments.
+    ///
+    /// If the call returns a Python awaitable, it is resolved before the
+    /// result is returned. Synchronous callables are also supported.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        KeyValuePairs<String, PythonConvertible> = [:]) async throws -> PythonObject {
+        return try await awaitResult(
+            _callSynchronously(args))
+    }
+
+    /// Asynchronously calls `self` with dynamically constructed positional
+    /// and keyword arguments.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @discardableResult
+    public func dynamicallyCall(
+        withKeywordArguments args:
+        [(key: String, value: PythonConvertible)]) async throws -> PythonObject {
+        return try await awaitResult(
+            _callSynchronously(args))
+    }
+
     /// Call `self` with the specified positional arguments.
     /// If the call fails for some reason, `PythonError.invalidCall` is thrown.
     /// - Precondition: `self` must be a Python callable.
@@ -283,7 +377,7 @@ public struct ThrowingPythonObject {
     @discardableResult
     public func dynamicallyCall(
         withArguments args: PythonConvertible...) throws -> PythonObject {
-        return try dynamicallyCall(withArguments: args)
+        return try callSynchronously(withArguments: args)
     }
 
     /// Call `self` with the specified positional arguments.
@@ -293,6 +387,11 @@ public struct ThrowingPythonObject {
     @discardableResult
     public func dynamicallyCall(
         withArguments args: [PythonConvertible] = []) throws -> PythonObject {
+        return try callSynchronously(withArguments: args)
+    }
+
+    private func callSynchronously(
+        withArguments args: [PythonConvertible]) throws -> PythonObject {
         try throwPythonErrorIfPresent()
 
         // Positional arguments are passed as a tuple of objects.
@@ -322,7 +421,7 @@ public struct ThrowingPythonObject {
     public func dynamicallyCall(
         withKeywordArguments args:
         KeyValuePairs<String, PythonConvertible> = [:]) throws -> PythonObject {
-        return try _dynamicallyCall(args)
+        return try _callSynchronously(args)
     }
 
     /// Alias for the function above that lets the caller dynamically construct the argument list, without using a dictionary literal.
@@ -331,11 +430,11 @@ public struct ThrowingPythonObject {
     public func dynamicallyCall(
         withKeywordArguments args:
         [(key: String, value: PythonConvertible)] = []) throws -> PythonObject {
-        return try _dynamicallyCall(args)
+        return try _callSynchronously(args)
     }
 
     /// Implementation of `dynamicallyCall(withKeywordArguments)`.
-    private func _dynamicallyCall<T : Collection>(_ args: T) throws -> PythonObject
+    private func _callSynchronously<T : Collection>(_ args: T) throws -> PythonObject
     where T.Element == (key: String, value: PythonConvertible) {
         try throwPythonErrorIfPresent()
 
@@ -610,6 +709,14 @@ public extension PythonObject {
             fatalError("Could not convert PythonObject to a 4-element tuple")
         }
         return result
+    }
+
+    /// Resolves `self` if it is a Python awaitable object (such as a coroutine,
+    /// Task, or Future), returning the completed result. If `self` is not
+    /// awaitable, returns `self`.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func awaitResult() async throws -> PythonObject {
+        return try await throwing.awaitResult(self)
     }
 
     /// Call `self` with the specified positional arguments.
@@ -1786,7 +1893,7 @@ fileprivate extension PythonFunction {
         let function = Unmanaged<PyFunction>.fromOpaque(funcPointer).takeUnretainedValue()
 
         do {
-            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            let argumentsAsTuple = PythonObject(argumentsPointer)
             return try function(argumentsAsTuple).ownedPyObject
         } catch {
             PythonFunction.setPythonError(swiftError: error)
@@ -1805,10 +1912,10 @@ fileprivate extension PythonFunction {
         let function = Unmanaged<PyFunction>.fromOpaque(funcPointer).takeUnretainedValue()
 
         do {
-            let argumentsAsTuple = PythonObject(consuming: argumentsPointer)
+            let argumentsAsTuple = PythonObject(argumentsPointer)
             var keywordArgumentsAsDictionary: PythonObject
             if let keywordArgumentsPointer = keywordArgumentsPointer {
-                keywordArgumentsAsDictionary = PythonObject(consuming: keywordArgumentsPointer)
+                keywordArgumentsAsDictionary = PythonObject(keywordArgumentsPointer)
             } else {
                 keywordArgumentsAsDictionary = [:]
             }

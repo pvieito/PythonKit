@@ -41,6 +41,12 @@ let Py_GE: Int32 = 5
 let Py_Initialize: @convention(c) () -> Void =
     PythonLibrary.loadSymbol(name: "Py_Initialize")
 
+let PyGILState_Ensure: @convention(c) () -> Int32 =
+    PythonLibrary.loadSymbol(name: "PyGILState_Ensure")
+
+let PyGILState_Release: @convention(c) (Int32) -> Void =
+    PythonLibrary.loadSymbol(name: "PyGILState_Release")
+
 let Py_IncRef: @convention(c) (PyObjectPointer?) -> Void =
     PythonLibrary.loadSymbol(name: "Py_IncRef")
 
